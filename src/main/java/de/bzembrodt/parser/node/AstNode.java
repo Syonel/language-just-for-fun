@@ -5,7 +5,7 @@ import de.bzembrodt.lexer.Token;
 
 public abstract class AstNode {
 
-    public Token token;
+    public final Token token;
 
     public AstNode(Token token) {
         this.token = token;

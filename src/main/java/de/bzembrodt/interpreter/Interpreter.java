@@ -56,8 +56,7 @@ public class Interpreter {
 
         FunctionDefinitionNode func = (FunctionDefinitionNode) runtimeValue.value;
         assert func.arguments.size() == args.size();
-        Scope functionScope = new Scope(Optional.of(globalScope), Optional.of(currentScope));
-        currentScope = functionScope;
+        currentScope = new Scope(Optional.of(globalScope), Optional.of(currentScope));
         for (int i = 0; i < args.size(); i++) {
             Object argValue = args.get(i);
             String argName = func.arguments.get(i).name();

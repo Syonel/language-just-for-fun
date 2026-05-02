@@ -5,6 +5,7 @@ import de.bzembrodt.lexer.Token;
 
 import java.util.Optional;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class ReturnNode extends AstNode {
     public final Optional<AstNode> value;
 

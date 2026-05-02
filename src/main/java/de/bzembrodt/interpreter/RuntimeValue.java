@@ -2,7 +2,7 @@ package de.bzembrodt.interpreter;
 
 public class RuntimeValue {
     public final String type;
-    public boolean isConst;
+    public final boolean isConst;
     public boolean isInitialized;
     public Object value;
 
