@@ -11,30 +11,27 @@ public class Lexer {
 
         Token activeToken = null;
 
-        int currentOffset = 0;
-        int currentLine = 1;
-        int currentColumn = 1;
+        Position position = new Position();
 
         for (char c : source.toCharArray()) {
-            activeToken = getOrExtendToken(c, activeToken, currentOffset, currentLine, currentColumn, tokens);
+            activeToken = getOrExtendToken(c, activeToken, position, tokens);
 
-            currentOffset++;
-            currentColumn++;
             if (c == '\n') {
-                currentLine++;
-                currentColumn = 1;
+                position = position.newLine();
+            } else {
+                position = position.advance();
             }
         }
         if (activeToken != null) {
             tokens.add(activeToken);
         }
-        tokens.add(new Token(TokenType.EOF, (char) 0, currentOffset, currentLine, currentColumn));
+        tokens.add(new Token(TokenType.EOF, (char) 0, position));
         return tokens;
     }
 
-    private static Token getOrExtendToken(char c, Token activeToken, int currentOffset, int currentLine, int currentColumn, List<Token> tokens) {
+    private static Token getOrExtendToken(char c, Token activeToken, Position position, List<Token> tokens) {
         if (activeToken == null) {
-            return createNewToken(c, currentOffset, currentLine, currentColumn);
+            return createNewToken(c, position);
         }
         if (activeToken.type.canExtendFunc.apply(c, activeToken.value)) {
             activeToken.extend(c);
@@ -43,13 +40,13 @@ public class Lexer {
 
         tokens.add(activeToken);
 
-        return createNewToken(c, currentOffset, currentLine, currentColumn);
+        return createNewToken(c, position);
     }
 
-    private static Token createNewToken(char c, int currentOffset, int currentLine, int currentColumn) {
+    private static Token createNewToken(char c, Position position) {
         TokenType type = TokenType.getTokenType(c);
         if (type != null) {
-            return new Token(TokenType.getTokenType(c), c, currentOffset, currentLine, currentColumn);
+            return new Token(TokenType.getTokenType(c), c, position);
         }
         return null;
     }

@@ -3,16 +3,12 @@ package de.bzembrodt.lexer;
 public class Token {
     public final TokenType type;
     public String value;
-    public final int offset;
-    public final int line;
-    public final int column;
+    public final Position position;
 
-    public Token(TokenType type, char c, int offset, int line, int column) {
+    public Token(TokenType type, char c, Position position) {
         this.type = type;
         this.value = String.valueOf(c);
-        this.offset = offset;
-        this.line = line;
-        this.column = column;
+        this.position = position;
     }
 
     public void extend(char c) {
@@ -21,6 +17,6 @@ public class Token {
 
     @Override
     public String toString() {
-        return type.name() + "('" + value + "')[" + line + ":" + column + "]";
+        return type.name() + "('" + value + "')[" + position.line + ":" + position.column + "]";
     }
 }
