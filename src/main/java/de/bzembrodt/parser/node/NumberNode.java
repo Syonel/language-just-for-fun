@@ -1,5 +1,6 @@
 package de.bzembrodt.parser.node;
 
+import de.bzembrodt.interpreter.Interpreter;
 import de.bzembrodt.lexer.Token;
 
 public class NumberNode extends AstNode {
@@ -11,6 +12,10 @@ public class NumberNode extends AstNode {
         this.token = token;
     }
 
+    @Override
+    public Object evaluate(Interpreter interpreter) {
+        return value;
+    }
 
     @Override
     public String toString() {

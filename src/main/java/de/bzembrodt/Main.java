@@ -1,6 +1,7 @@
 package de.bzembrodt;
 
 
+import de.bzembrodt.interpreter.Interpreter;
 import de.bzembrodt.lexer.Lexer;
 import de.bzembrodt.lexer.Token;
 import de.bzembrodt.parser.Parser;
@@ -23,6 +24,11 @@ public class Main {
         Parser parser = new Parser();
         AstNode programNode = parser.parse(tokens);
         IO.println(programNode);
+
+        Interpreter interpreter = new Interpreter();
+        Object result = interpreter.interpret(programNode);
+        IO.println("Result: " + result);
+
 
     }
 }
