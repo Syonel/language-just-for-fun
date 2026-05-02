@@ -15,7 +15,8 @@ import java.util.List;
 public class Main {
     static void main() throws IOException {
 
-        String fileContent = Files.readString(Path.of("tests/001_print_number.ljff"));
+        //String fileContent = Files.readString(Path.of("tests/001_print_number.ljff"));
+        String fileContent = Files.readString(Path.of("tests/002_addition.ljff"));
 
         Lexer lexer = new Lexer();
         List<Token> tokens = lexer.lex(fileContent);
@@ -28,7 +29,6 @@ public class Main {
         Interpreter interpreter = new Interpreter();
         Object result = interpreter.interpret(programNode);
         IO.println("Result: " + result);
-
 
     }
 }

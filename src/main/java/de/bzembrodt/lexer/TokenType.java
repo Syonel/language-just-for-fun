@@ -8,6 +8,7 @@ public enum TokenType {
     NUMBER(TokenType::isNumeric, (c, _) -> isNumeric(c)),
 
     SEMICOLON(';'),
+    PLUS('+'),
     OPEN_ROUND_BRACKET('('),
     CLOSE_ROUND_BRACKET(')'),
     EOF(_ -> false, (_, _) -> false);

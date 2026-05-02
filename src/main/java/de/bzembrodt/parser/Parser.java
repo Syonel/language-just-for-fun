@@ -3,6 +3,7 @@ package de.bzembrodt.parser;
 import de.bzembrodt.lexer.Token;
 import de.bzembrodt.lexer.TokenType;
 import de.bzembrodt.parser.node.AstNode;
+import de.bzembrodt.parser.node.BinaryOperation;
 import de.bzembrodt.parser.node.FunctionCallNode;
 import de.bzembrodt.parser.node.NumberNode;
 
@@ -19,13 +20,25 @@ public class Parser {
     }
 
     private AstNode parseStatement(TokenList tokenList) {
-        AstNode statement = parseExpression(tokenList);
+        AstNode statement = parseArithmeticExpression(tokenList);
         assert tokenList.getToken().type == TokenType.SEMICOLON;
         tokenList.advance();
         return statement;
     }
 
-    private AstNode parseExpression(TokenList tokenList) {
+    private AstNode parseArithmeticExpression(TokenList tokenList) {
+        AstNode lhs = parsePrimaryExpression(tokenList);
+        Token token = tokenList.getToken();
+        if (token.type == TokenType.PLUS) {
+            tokenList.advance();
+
+            AstNode rhs = parsePrimaryExpression(tokenList);
+            return new BinaryOperation(lhs, BinaryOperation.Operator.PLUS, rhs, token);
+        }
+        return lhs;
+    }
+
+    private AstNode parsePrimaryExpression(TokenList tokenList) {
         AstNode expression = null;
 
         Token token = tokenList.getToken();
@@ -52,7 +65,7 @@ public class Parser {
         assert tokenList.getToken().type == TokenType.OPEN_ROUND_BRACKET;
         tokenList.advance();
 
-        AstNode param = parseExpression(tokenList);
+        AstNode param = parseArithmeticExpression(tokenList);
 
         assert tokenList.getToken().type == TokenType.CLOSE_ROUND_BRACKET;
         tokenList.advance();

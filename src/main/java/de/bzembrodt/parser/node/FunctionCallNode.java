@@ -9,12 +9,11 @@ import java.util.stream.Collectors;
 public class FunctionCallNode extends AstNode {
     public final String name;
     public final List<AstNode> arguments;
-    public final Token token;
 
     public FunctionCallNode(String name, List<AstNode> arguments, Token token) {
+        super(token);
         this.name = name;
         this.arguments = arguments;
-        this.token = token;
     }
 
     @Override

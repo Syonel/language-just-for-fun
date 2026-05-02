@@ -5,11 +5,10 @@ import de.bzembrodt.lexer.Token;
 
 public class NumberNode extends AstNode {
     public final long value;
-    public final Token token;
 
     public NumberNode(long value, Token token) {
+        super(token);
         this.value = value;
-        this.token = token;
     }
 
     @Override
