@@ -56,6 +56,13 @@ class TestExamples {
                 "2\n",
                 null
         ));
+        TEST_CASES.add(new TestCase(
+                "005_multiple_statments.ljff",
+                "[IDENTIFIER(print)[1:1], OPEN_ROUND_BRACKET[1:6], NUMBER(1)[1:7], CLOSE_ROUND_BRACKET[1:8], SEMICOLON[1:9], IDENTIFIER(print)[2:1], OPEN_ROUND_BRACKET[2:6], NUMBER(2)[2:7], CLOSE_ROUND_BRACKET[2:8], SEMICOLON[2:9], EOF[2:10]]",
+                "{\n\tcall['print'](#1)\n\tcall['print'](#2)\n}",
+                "1\n2\n",
+                null
+        ));
     }
 
     @Test

@@ -2,24 +2,25 @@ package de.bzembrodt.parser;
 
 import de.bzembrodt.lexer.Token;
 import de.bzembrodt.lexer.TokenType;
-import de.bzembrodt.parser.node.AstNode;
-import de.bzembrodt.parser.node.BinaryOperation;
-import de.bzembrodt.parser.node.FunctionCallNode;
-import de.bzembrodt.parser.node.NumberNode;
+import de.bzembrodt.parser.node.*;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 public class Parser {
 
     public AstNode parse(List<Token> tokens) {
 
         TokenList tokenList = new TokenList(tokens);
-        AstNode statement = parseStatement(tokenList);
+        return parseProgram(tokenList);
+    }
+
+    private AstNode parseProgram(TokenList tokenList) {
+        List<AstNode> statements = new ArrayList<>();
+        while (tokenList.getToken().type != TokenType.EOF) {
+            statements.add(parseStatement(tokenList));
+        }
         assert tokenList.getToken().type == TokenType.EOF;
-        return statement;
+        return new ProgramNode(statements);
     }
 
     private AstNode parseStatement(TokenList tokenList) {
