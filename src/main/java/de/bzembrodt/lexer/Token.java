@@ -17,6 +17,10 @@ public class Token {
 
     @Override
     public String toString() {
-        return type.name() + "('" + value + "')[" + position.line + ":" + position.column + "]";
+        String value = switch (type) {
+            case IDENTIFIER, NUMBER -> "(" + this.value + ")";
+            default -> "";
+        };
+        return type.name() + value + "[" + position.line + ":" + position.column + "]";
     }
 }

@@ -29,7 +29,7 @@ public class BinaryOperation extends AstNode {
 
     @Override
     public String toString() {
-        return lhs.toString() + " " + operator.toString() + " " + rhs.toString();
+        return "(" + lhs.toString() + " " + operator.toString() + " " + rhs.toString() + ")";
     }
 
     public enum Operator {
