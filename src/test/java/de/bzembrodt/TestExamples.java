@@ -70,6 +70,13 @@ class TestExamples {
                 "5\n",
                 null
         ));
+        TEST_CASES.add(new TestCase(
+                "007_multiple_constants.ljff",
+                "[IDENTIFIER(const)[1:1], IDENTIFIER(a)[1:7], COLON[1:8], IDENTIFIER(int)[1:10], EQUALS[1:14], NUMBER(1)[1:16], SEMICOLON[1:17], IDENTIFIER(const)[2:1], IDENTIFIER(b)[2:7], COLON[2:8], IDENTIFIER(int)[2:10], EQUALS[2:14], NUMBER(2)[2:16], SEMICOLON[2:17], IDENTIFIER(const)[3:1], IDENTIFIER(c)[3:7], COLON[3:8], IDENTIFIER(int)[3:10], EQUALS[3:14], IDENTIFIER(a)[3:16], PLUS[3:18], NUMBER(2)[3:20], MULTIPLY[3:22], IDENTIFIER(b)[3:24], SEMICOLON[3:25], IDENTIFIER(print)[4:1], OPEN_ROUND_BRACKET[4:6], IDENTIFIER(c)[4:7], CLOSE_ROUND_BRACKET[4:8], SEMICOLON[4:9], EOF[4:10]]",
+                "{\n\tdecl_c['a'] = #1\n\tdecl_c['b'] = #2\n\tdecl_c['c'] = (@a + (#2 * @b))\n\tcall['print'](@c)\n}",
+                "5\n",
+                null
+        ));
     }
 
     @Test
