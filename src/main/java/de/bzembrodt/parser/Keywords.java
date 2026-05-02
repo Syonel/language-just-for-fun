@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 public enum Keywords {
     CONST("const"),
     VAR("var"),
+    FN("fn"),
+    RETURN("return"),
     ;
 
     public final String name;

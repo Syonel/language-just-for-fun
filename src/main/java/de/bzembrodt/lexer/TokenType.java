@@ -13,9 +13,12 @@ public enum TokenType {
     MULTIPLY('*'),
     DIVIDE('/'),
     EQUALS('='),
+    COMMA(','),
     COLON(':'),
     OPEN_ROUND_BRACKET('('),
     CLOSE_ROUND_BRACKET(')'),
+    OPEN_CURLY_BRACKET('{'),
+    CLOSE_CURLY_BRACKET('}'),
     EOF(_ -> false, (_, _) -> false);
 
     public final Predicate<Character> matchesFunc;

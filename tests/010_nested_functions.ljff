@@ -1,0 +1,7 @@
+fn add(a: int, b: int): int {
+    return double(a) + double(b);
+}
+fn double(a: int): int {
+    return a * 2;
+}
+print(add(1, 2));

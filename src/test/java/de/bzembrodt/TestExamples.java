@@ -84,6 +84,20 @@ class TestExamples {
                 "3\n",
                 null
         ));
+        TEST_CASES.add(new TestCase(
+                "009_functions.ljff",
+                "[IDENTIFIER(fn)[1:1], IDENTIFIER(add)[1:4], OPEN_ROUND_BRACKET[1:7], IDENTIFIER(a)[1:8], COLON[1:9], IDENTIFIER(int)[1:11], COMMA[1:14], IDENTIFIER(b)[1:16], COLON[1:17], IDENTIFIER(int)[1:19], CLOSE_ROUND_BRACKET[1:22], COLON[1:23], IDENTIFIER(int)[1:25], OPEN_CURLY_BRACKET[1:29], IDENTIFIER(return)[2:5], IDENTIFIER(a)[2:12], PLUS[2:14], IDENTIFIER(b)[2:16], SEMICOLON[2:17], CLOSE_CURLY_BRACKET[3:1], IDENTIFIER(print)[4:1], OPEN_ROUND_BRACKET[4:6], IDENTIFIER(add)[4:7], OPEN_ROUND_BRACKET[4:10], NUMBER(1)[4:11], COMMA[4:12], NUMBER(2)[4:14], CLOSE_ROUND_BRACKET[4:15], CLOSE_ROUND_BRACKET[4:16], SEMICOLON[4:17], EOF[4:18]]",
+                "{\n\tdecl_f['add'](a, b) = {\n\treturn (@a + @b)\n\treturn\n}\n\tcall['print'](call['add'](#1, #2))\n}",
+                "3\n",
+                null
+        ));
+        TEST_CASES.add(new TestCase(
+                "010_nested_functions.ljff",
+                "[IDENTIFIER(fn)[1:1], IDENTIFIER(add)[1:4], OPEN_ROUND_BRACKET[1:7], IDENTIFIER(a)[1:8], COLON[1:9], IDENTIFIER(int)[1:11], COMMA[1:14], IDENTIFIER(b)[1:16], COLON[1:17], IDENTIFIER(int)[1:19], CLOSE_ROUND_BRACKET[1:22], COLON[1:23], IDENTIFIER(int)[1:25], OPEN_CURLY_BRACKET[1:29], IDENTIFIER(return)[2:5], IDENTIFIER(double)[2:12], OPEN_ROUND_BRACKET[2:18], IDENTIFIER(a)[2:19], CLOSE_ROUND_BRACKET[2:20], PLUS[2:22], IDENTIFIER(double)[2:24], OPEN_ROUND_BRACKET[2:30], IDENTIFIER(b)[2:31], CLOSE_ROUND_BRACKET[2:32], SEMICOLON[2:33], CLOSE_CURLY_BRACKET[3:1], IDENTIFIER(fn)[4:1], IDENTIFIER(double)[4:4], OPEN_ROUND_BRACKET[4:10], IDENTIFIER(a)[4:11], COLON[4:12], IDENTIFIER(int)[4:14], CLOSE_ROUND_BRACKET[4:17], COLON[4:18], IDENTIFIER(int)[4:20], OPEN_CURLY_BRACKET[4:24], IDENTIFIER(return)[5:5], IDENTIFIER(a)[5:12], MULTIPLY[5:14], NUMBER(2)[5:16], SEMICOLON[5:17], CLOSE_CURLY_BRACKET[6:1], IDENTIFIER(print)[7:1], OPEN_ROUND_BRACKET[7:6], IDENTIFIER(add)[7:7], OPEN_ROUND_BRACKET[7:10], NUMBER(1)[7:11], COMMA[7:12], NUMBER(2)[7:14], CLOSE_ROUND_BRACKET[7:15], CLOSE_ROUND_BRACKET[7:16], SEMICOLON[7:17], EOF[7:18]]",
+                "{\n\tdecl_f['add'](a, b) = {\n\treturn (call['double'](@a) + call['double'](@b))\n\treturn\n}\n\tdecl_f['double'](a) = {\n\treturn (@a * #2)\n\treturn\n}\n\tcall['print'](call['add'](#1, #2))\n}",
+                "6\n",
+                null
+        ));
     }
 
     @Test
