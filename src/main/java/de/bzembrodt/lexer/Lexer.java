@@ -28,6 +28,7 @@ public class Lexer {
         if (activeToken != null) {
             tokens.add(activeToken);
         }
+        tokens.add(new Token(TokenType.EOF, (char) 0, currentOffset, currentLine, currentColumn));
         return tokens;
     }
 

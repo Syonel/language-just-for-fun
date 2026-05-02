@@ -10,7 +10,7 @@ public enum TokenType {
     SEMICOLON(';'),
     OPEN_ROUND_BRACKET('('),
     CLOSE_ROUND_BRACKET(')'),
-    UNKNOWN(_ -> false, (_, _) -> false);
+    EOF(_ -> false, (_, _) -> false);
 
     public final Predicate<Character> matchesFunc;
     public final BiFunction<Character, String, Boolean> canExtendFunc;
