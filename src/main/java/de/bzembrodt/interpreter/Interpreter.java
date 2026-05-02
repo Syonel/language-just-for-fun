@@ -38,6 +38,16 @@ public class Interpreter {
         variables.put(name, new RuntimeValue(type, isConst, value.isPresent(), value.orElse(null)));
     }
 
+    public void assignVariable(String name, Object value) {
+        assert variables.containsKey(name);
+
+        RuntimeValue runtimeValue = variables.get(name);
+        assert !runtimeValue.isConst;
+
+        runtimeValue.value = value;
+        runtimeValue.isInitialized = true;
+    }
+
     public Object lookupVariable(String name) {
         RuntimeValue value = variables.get(name);
         assert value != null;
@@ -45,4 +55,5 @@ public class Interpreter {
 
         return value.value;
     }
+
 }

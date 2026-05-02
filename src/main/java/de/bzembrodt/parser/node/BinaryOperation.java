@@ -24,6 +24,11 @@ public class BinaryOperation extends AstNode {
             case MINUS -> lhsValue - rhsValue;
             case MULTIPLY -> lhsValue * rhsValue;
             case DIVIDE -> lhsValue / rhsValue;
+            //Handled by other node
+            case EQUALS -> {
+                assert false;
+                yield null;
+            }
         };
     }
 
@@ -33,10 +38,11 @@ public class BinaryOperation extends AstNode {
     }
 
     public enum Operator {
-        PLUS("+", 1),
-        MINUS("-", 1),
-        MULTIPLY("*", 2),
-        DIVIDE("/", 2),
+        PLUS("+", 2),
+        MINUS("-", 2),
+        MULTIPLY("*", 3),
+        DIVIDE("/", 3),
+        EQUALS("=", 1),
         ;
 
         private final String stringValue;

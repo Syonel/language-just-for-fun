@@ -25,7 +25,7 @@ public class Parser {
 
     private AstNode parseStatement(TokenList tokenList) {
         AstNode statement;
-        if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keywords.CONST.name)) {
+        if (tokenList.getToken().type == TokenType.IDENTIFIER && (tokenList.getToken().value.equals(Keywords.CONST.name) || tokenList.getToken().value.equals(Keywords.VAR.name))) {
             statement = parseVariableDeclaration(tokenList);
         } else {
             statement = parseArithmeticExpression(tokenList);
@@ -37,8 +37,8 @@ public class Parser {
 
     private AstNode parseVariableDeclaration(TokenList tokenList) {
         Token token = tokenList.getToken();
-        assert token.type == TokenType.IDENTIFIER && token.value.equals(Keywords.CONST.name);
-        boolean isConst = true;
+        assert token.type == TokenType.IDENTIFIER && (token.value.equals(Keywords.CONST.name) || token.value.equals(Keywords.VAR.name));
+        boolean isConst = token.value.equals(Keywords.CONST.name);
         tokenList.advance();
 
         assert tokenList.getToken().type == TokenType.IDENTIFIER;
@@ -59,13 +59,15 @@ public class Parser {
             tokenList.advance();
             initializer = Optional.of(parseArithmeticExpression(tokenList));
         }
+        // Constants have to be initialized directly
+        assert !isConst || initializer.isPresent();
         return new VariableDeclarationNode(isConst, name, type, initializer, token);
     }
 
     private record OperatorAndToken(BinaryOperation.Operator op, Token token) {
     }
 
-    private static final Set<TokenType> OPERATORS = EnumSet.of(TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE);
+    private static final Set<TokenType> OPERATORS = EnumSet.of(TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.EQUALS);
 
     private AstNode parseArithmeticExpression(TokenList tokenList) {
         Stack<AstNode> operands = new Stack<>();
@@ -81,16 +83,14 @@ public class Parser {
                 case MINUS -> BinaryOperation.Operator.MINUS;
                 case MULTIPLY -> BinaryOperation.Operator.MULTIPLY;
                 case DIVIDE -> BinaryOperation.Operator.DIVIDE;
+                case EQUALS -> BinaryOperation.Operator.EQUALS;
                 default -> null;
             };
             assert binOp != null;
             tokenList.advance();
 
             while (!operators.isEmpty() && operators.peek().op.precedence > binOp.precedence) {
-                AstNode rhs = operands.pop();
-                AstNode lhs = operands.pop();
-                OperatorAndToken opAndToken = operators.pop();
-                operands.push(new BinaryOperation(lhs, opAndToken.op, rhs, opAndToken.token));
+                joinBinaryOperation(operands, operators);
             }
 
             operators.push(new OperatorAndToken(binOp, token));
@@ -99,14 +99,24 @@ public class Parser {
         }
 
         while (!operators.isEmpty()) {
-            AstNode rhs = operands.pop();
-            AstNode lhs = operands.pop();
-            OperatorAndToken opAndToken = operators.pop();
-            operands.push(new BinaryOperation(lhs, opAndToken.op, rhs, opAndToken.token));
+            joinBinaryOperation(operands, operators);
         }
 
         assert operands.size() == 1;
         return operands.pop();
+    }
+
+    private static void joinBinaryOperation(Stack<AstNode> operands, Stack<OperatorAndToken> operators) {
+        AstNode rhs = operands.pop();
+        AstNode lhs = operands.pop();
+        OperatorAndToken opAndToken = operators.pop();
+        if (opAndToken.op == BinaryOperation.Operator.EQUALS) {
+            assert lhs instanceof NameLookupNode;
+            NameLookupNode lhsName = (NameLookupNode) lhs;
+            operands.push(new VariableAssignmentNode(lhsName.name, rhs, opAndToken.token));
+        } else {
+            operands.push(new BinaryOperation(lhs, opAndToken.op, rhs, opAndToken.token));
+        }
     }
 
     private AstNode parsePrimaryExpression(TokenList tokenList) {

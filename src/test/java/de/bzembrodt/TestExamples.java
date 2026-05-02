@@ -77,6 +77,13 @@ class TestExamples {
                 "5\n",
                 null
         ));
+        TEST_CASES.add(new TestCase(
+                "008_variables.ljff",
+                "[IDENTIFIER(var)[1:1], IDENTIFIER(a)[1:5], COLON[1:6], IDENTIFIER(int)[1:8], EQUALS[1:12], NUMBER(1)[1:14], SEMICOLON[1:15], IDENTIFIER(a)[2:1], EQUALS[2:3], IDENTIFIER(a)[2:5], PLUS[2:7], NUMBER(2)[2:9], SEMICOLON[2:10], IDENTIFIER(print)[3:1], OPEN_ROUND_BRACKET[3:6], IDENTIFIER(a)[3:7], CLOSE_ROUND_BRACKET[3:8], SEMICOLON[3:9], EOF[3:10]]",
+                "{\n\tdecl_v['a'] = #1\n\tset['a'] = (@a + #2)\n\tcall['print'](@a)\n}",
+                "3\n",
+                null
+        ));
     }
 
     @Test

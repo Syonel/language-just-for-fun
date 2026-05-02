@@ -5,7 +5,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public enum Keywords {
-    CONST("const");
+    CONST("const"),
+    VAR("var"),
+    ;
 
     public final String name;
 
