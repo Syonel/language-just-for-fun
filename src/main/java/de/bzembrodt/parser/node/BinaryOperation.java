@@ -17,10 +17,14 @@ public class BinaryOperation extends AstNode {
 
     @Override
     public Object evaluate(Interpreter interpreter) {
-        Object lhsValue = this.lhs.evaluate(interpreter);
-        Object rhsValue = this.rhs.evaluate(interpreter);
-        assert lhsValue instanceof Long && rhsValue instanceof Long;
-        return (Long) lhsValue + (Long) rhsValue;
+        Long lhsValue = (Long) this.lhs.evaluate(interpreter);
+        Long rhsValue = (Long) this.rhs.evaluate(interpreter);
+        return switch (operator) {
+            case PLUS -> lhsValue + rhsValue;
+            case MINUS -> lhsValue - rhsValue;
+            case MULTIPLY -> lhsValue * rhsValue;
+            case DIVIDE -> lhsValue / rhsValue;
+        };
     }
 
     @Override
@@ -29,12 +33,18 @@ public class BinaryOperation extends AstNode {
     }
 
     public enum Operator {
-        PLUS("+");
+        PLUS("+", 1),
+        MINUS("-", 1),
+        MULTIPLY("*", 2),
+        DIVIDE("/", 2),
+        ;
 
         private final String stringValue;
+        public final int precedence;
 
-        Operator(String stringValue) {
+        Operator(String stringValue, int precedence) {
             this.stringValue = stringValue;
+            this.precedence = precedence;
         }
 
         @Override

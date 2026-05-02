@@ -16,7 +16,8 @@ public class Main {
     static void main() throws IOException {
 
         //String fileContent = Files.readString(Path.of("tests/001_print_number.ljff"));
-        String fileContent = Files.readString(Path.of("tests/002_addition.ljff"));
+        //String fileContent = Files.readString(Path.of("tests/002_addition.ljff"));
+        String fileContent = Files.readString(Path.of("tests/003_simple_math.ljff"));
 
         Lexer lexer = new Lexer();
         List<Token> tokens = lexer.lex(fileContent);

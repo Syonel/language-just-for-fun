@@ -9,6 +9,9 @@ public enum TokenType {
 
     SEMICOLON(';'),
     PLUS('+'),
+    MINUS('-'),
+    MULTIPLY('*'),
+    DIVIDE('/'),
     OPEN_ROUND_BRACKET('('),
     CLOSE_ROUND_BRACKET(')'),
     EOF(_ -> false, (_, _) -> false);

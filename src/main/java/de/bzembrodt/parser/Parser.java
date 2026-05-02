@@ -7,7 +7,10 @@ import de.bzembrodt.parser.node.BinaryOperation;
 import de.bzembrodt.parser.node.FunctionCallNode;
 import de.bzembrodt.parser.node.NumberNode;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 
 public class Parser {
 
@@ -26,16 +29,51 @@ public class Parser {
         return statement;
     }
 
+    private record OperatorAndToken(BinaryOperation.Operator op, Token token) {
+    }
+
+    private static final Set<TokenType> OPERATORS = EnumSet.of(TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE);
+
     private AstNode parseArithmeticExpression(TokenList tokenList) {
-        AstNode lhs = parsePrimaryExpression(tokenList);
-        Token token = tokenList.getToken();
-        if (token.type == TokenType.PLUS) {
+        Stack<AstNode> operands = new Stack<>();
+        Stack<OperatorAndToken> operators = new Stack<>();
+
+        operands.push(parsePrimaryExpression(tokenList));
+
+        while (OPERATORS.contains(tokenList.getToken().type)) {
+
+            Token token = tokenList.getToken();
+            BinaryOperation.Operator binOp = switch (token.type) {
+                case PLUS -> BinaryOperation.Operator.PLUS;
+                case MINUS -> BinaryOperation.Operator.MINUS;
+                case MULTIPLY -> BinaryOperation.Operator.MULTIPLY;
+                case DIVIDE -> BinaryOperation.Operator.DIVIDE;
+                default -> null;
+            };
+            assert binOp != null;
             tokenList.advance();
 
-            AstNode rhs = parsePrimaryExpression(tokenList);
-            return new BinaryOperation(lhs, BinaryOperation.Operator.PLUS, rhs, token);
+            while (!operators.isEmpty() && operators.peek().op.precedence > binOp.precedence) {
+                AstNode rhs = operands.pop();
+                AstNode lhs = operands.pop();
+                OperatorAndToken opAndToken = operators.pop();
+                operands.push(new BinaryOperation(lhs, opAndToken.op, rhs, opAndToken.token));
+            }
+
+            operators.push(new OperatorAndToken(binOp, token));
+
+            operands.push(parsePrimaryExpression(tokenList));
         }
-        return lhs;
+
+        while (!operators.isEmpty()) {
+            AstNode rhs = operands.pop();
+            AstNode lhs = operands.pop();
+            OperatorAndToken opAndToken = operators.pop();
+            operands.push(new BinaryOperation(lhs, opAndToken.op, rhs, opAndToken.token));
+        }
+
+        assert operands.size() == 1;
+        return operands.pop();
     }
 
     private AstNode parsePrimaryExpression(TokenList tokenList) {
