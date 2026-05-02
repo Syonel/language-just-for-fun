@@ -13,7 +13,38 @@ public class Lexer {
 
         Position position = new Position();
 
-        for (char c : source.toCharArray()) {
+        char[] sourceArray = source.toCharArray();
+        //TODO comment handling is quite nasty right now. Should be improved
+        for (int i = 0; i < sourceArray.length; i++) {
+            char c = sourceArray[i];
+            if (c == '/' && i + 1 < sourceArray.length && sourceArray[i + 1] == '/') {
+                for (; i < sourceArray.length && sourceArray[i] != '\n'; i++) {
+                    position = position.advance();
+                }
+                // step back so the \n can be consumed by the outer loop
+                i--;
+                continue;
+            }
+            if (c == '/' && i + 1 < sourceArray.length && sourceArray[i + 1] == '*') {
+                while (true) {
+                    if (sourceArray[i] == '\n') {
+                        position = position.newLine();
+                    } else {
+                        position = position.advance();
+                    }
+                    i++;
+                    // Unclosed comment
+                    assert i < sourceArray.length;
+                    if (sourceArray[i] == '*' && i + 1 < sourceArray.length && sourceArray[i + 1] == '/') {
+                        i++;
+                        position = position.advance();
+                        position = position.advance();
+                        break;
+                    }
+                }
+                continue;
+            }
+
             activeToken = getOrExtendToken(c, activeToken, position, tokens);
 
             if (c == '\n') {

@@ -49,6 +49,13 @@ class TestExamples {
                 "2\n",
                 null
         ));
+        TEST_CASES.add(new TestCase(
+                "004_comments.ljff",
+                "[IDENTIFIER(print)[2:1], OPEN_ROUND_BRACKET[2:6], NUMBER(1)[2:7], PLUS[2:8], NUMBER(1)[2:20], CLOSE_ROUND_BRACKET[2:21], SEMICOLON[2:22], EOF[2:23]]",
+                "call['print']((#1 + #1))",
+                "2\n",
+                null
+        ));
     }
 
     @Test

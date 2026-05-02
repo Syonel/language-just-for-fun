@@ -17,7 +17,8 @@ public class Main {
 
         //String fileContent = Files.readString(Path.of("tests/001_print_number.ljff"));
         //String fileContent = Files.readString(Path.of("tests/002_addition.ljff"));
-        String fileContent = Files.readString(Path.of("tests/003_simple_math.ljff"));
+        //String fileContent = Files.readString(Path.of("tests/003_simple_math.ljff"));
+        String fileContent = Files.readString(Path.of("tests/004_comments.ljff"));
 
         Lexer lexer = new Lexer();
         List<Token> tokens = lexer.lex(fileContent);
