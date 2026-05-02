@@ -3,6 +3,8 @@ package de.bzembrodt;
 
 import de.bzembrodt.lexer.Lexer;
 import de.bzembrodt.lexer.Token;
+import de.bzembrodt.parser.Parser;
+import de.bzembrodt.parser.node.AstNode;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,7 +18,11 @@ public class Main {
 
         Lexer lexer = new Lexer();
         List<Token> tokens = lexer.lex(fileContent);
-
         IO.println(tokens);
+
+        Parser parser = new Parser();
+        AstNode programNode = parser.parse(tokens);
+        IO.println(programNode);
+
     }
 }
