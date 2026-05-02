@@ -63,6 +63,13 @@ class TestExamples {
                 "1\n2\n",
                 null
         ));
+        TEST_CASES.add(new TestCase(
+                "006_constants.ljff",
+                "[IDENTIFIER(const)[1:1], IDENTIFIER(a)[1:7], COLON[1:8], IDENTIFIER(int)[1:10], EQUALS[1:14], NUMBER(5)[1:16], SEMICOLON[1:17], IDENTIFIER(print)[2:1], OPEN_ROUND_BRACKET[2:6], IDENTIFIER(a)[2:7], CLOSE_ROUND_BRACKET[2:8], SEMICOLON[2:9], EOF[2:10]]",
+                "{\n\tdecl_c['a'] = #5\n\tcall['print'](@a)\n}",
+                "5\n",
+                null
+        ));
     }
 
     @Test

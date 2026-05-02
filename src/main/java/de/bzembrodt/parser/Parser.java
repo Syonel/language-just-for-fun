@@ -24,10 +24,42 @@ public class Parser {
     }
 
     private AstNode parseStatement(TokenList tokenList) {
-        AstNode statement = parseArithmeticExpression(tokenList);
+        AstNode statement;
+        if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keywords.CONST.name)) {
+            statement = parseVariableDeclaration(tokenList);
+        } else {
+            statement = parseArithmeticExpression(tokenList);
+        }
         assert tokenList.getToken().type == TokenType.SEMICOLON;
         tokenList.advance();
         return statement;
+    }
+
+    private AstNode parseVariableDeclaration(TokenList tokenList) {
+        Token token = tokenList.getToken();
+        assert token.type == TokenType.IDENTIFIER && token.value.equals(Keywords.CONST.name);
+        boolean isConst = true;
+        tokenList.advance();
+
+        assert tokenList.getToken().type == TokenType.IDENTIFIER;
+        String name = tokenList.getToken().value;
+        tokenList.advance();
+
+        assert tokenList.getToken().type == TokenType.COLON;
+        tokenList.advance();
+
+        assert tokenList.getToken().type == TokenType.IDENTIFIER;
+        String type = tokenList.getToken().value;
+        //TODO For now we only support ints, extend to other types later
+        assert type.equals("int");
+        tokenList.advance();
+
+        Optional<AstNode> initializer = Optional.empty();
+        if (tokenList.getToken().type == TokenType.EQUALS) {
+            tokenList.advance();
+            initializer = Optional.of(parseArithmeticExpression(tokenList));
+        }
+        return new VariableDeclarationNode(isConst, name, type, initializer, token);
     }
 
     private record OperatorAndToken(BinaryOperation.Operator op, Token token) {
@@ -83,9 +115,13 @@ public class Parser {
         Token token = tokenList.getToken();
         switch (token.type) {
             case IDENTIFIER -> {
+                assert !Keywords.ALL_KEYWORDS.contains(token.value);
                 if (tokenList.peek().type == TokenType.OPEN_ROUND_BRACKET) {
                     expression = parseFunctionCall(tokenList);
+                    break;
                 }
+                expression = new NameLookupNode(token.value, token);
+                tokenList.advance();
             }
             case NUMBER -> {
                 expression = new NumberNode(Long.parseLong(token.value), token);

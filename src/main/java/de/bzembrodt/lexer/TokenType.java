@@ -12,6 +12,8 @@ public enum TokenType {
     MINUS('-'),
     MULTIPLY('*'),
     DIVIDE('/'),
+    EQUALS('='),
+    COLON(':'),
     OPEN_ROUND_BRACKET('('),
     CLOSE_ROUND_BRACKET(')'),
     EOF(_ -> false, (_, _) -> false);
