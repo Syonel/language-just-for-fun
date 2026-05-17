@@ -237,6 +237,14 @@ public class Parser {
                 expression = new NumberNode(Long.parseLong(token.value), token);
                 tokenList.advance();
             }
+            case EXCLAMATION_MARK -> {
+                tokenList.advance();
+                expression = new UnaryOperation(UnaryOperation.Operator.NOT, parsePrimaryExpression(tokenList), token);
+            }
+            case MINUS -> {
+                tokenList.advance();
+                expression = new UnaryOperation(UnaryOperation.Operator.NEGATE, parsePrimaryExpression(tokenList), token);
+            }
         }
         assert expression != null;
         return expression;

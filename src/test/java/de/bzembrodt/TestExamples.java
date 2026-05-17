@@ -112,6 +112,13 @@ class TestExamples {
                 "1\n2\nfalse\n2\nfalse\n2\nfalse\n1\n1\ntrue\n1\ntrue\n2\n1\ntrue\n2\n2\nfalse\n1\ntrue\n",
                 null
         ));
+        TEST_CASES.add(new TestCase(
+                "013_unary_operators.ljff",
+                "[IDENTIFIER(print)[1:1], OPEN_ROUND_BRACKET[1:6], EXCLAMATION_MARK[1:7], IDENTIFIER(true)[1:8], CLOSE_ROUND_BRACKET[1:12], SEMICOLON[1:13], IDENTIFIER(print)[2:1], OPEN_ROUND_BRACKET[2:6], EXCLAMATION_MARK[2:7], IDENTIFIER(false)[2:8], CLOSE_ROUND_BRACKET[2:13], SEMICOLON[2:14], IDENTIFIER(print)[3:1], OPEN_ROUND_BRACKET[3:6], EXCLAMATION_MARK[3:7], EXCLAMATION_MARK[3:8], IDENTIFIER(true)[3:9], CLOSE_ROUND_BRACKET[3:13], SEMICOLON[3:14], IDENTIFIER(print)[4:1], OPEN_ROUND_BRACKET[4:6], MINUS[4:7], NUMBER(1)[4:8], CLOSE_ROUND_BRACKET[4:9], SEMICOLON[4:10], IDENTIFIER(print)[5:1], OPEN_ROUND_BRACKET[5:6], MINUS[5:7], MINUS[5:8], NUMBER(1)[5:9], CLOSE_ROUND_BRACKET[5:10], SEMICOLON[5:11], EOF[5:12]]",
+                "{\n\tcall['print']((! #true))\n\tcall['print']((! #false))\n\tcall['print']((! (! #true)))\n\tcall['print']((- #1))\n\tcall['print']((- (- #1)))\n}",
+                "false\ntrue\ntrue\n-1\n1\n",
+                null
+        ));
     }
 
     @Test

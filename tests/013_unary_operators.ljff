@@ -1,0 +1,5 @@
+print(!true);
+print(!false);
+print(!!true);
+print(-1);
+print(--1);

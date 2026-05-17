@@ -21,6 +21,7 @@ public enum TokenType {
     CLOSE_CURLY_BRACKET('}'),
     AMPERSAND('&'),
     PIPE('|'),
+    EXCLAMATION_MARK('!'),
     EOF(_ -> false, (_, _) -> false);
 
     public final Predicate<Character> matchesFunc;
