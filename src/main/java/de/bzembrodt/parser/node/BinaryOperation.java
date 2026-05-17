@@ -17,13 +17,13 @@ public class BinaryOperation extends AstNode {
 
     @Override
     public Object evaluate(Interpreter interpreter) {
-        Long lhsValue = (Long) this.lhs.evaluate(interpreter);
-        Long rhsValue = (Long) this.rhs.evaluate(interpreter);
         return switch (operator) {
-            case PLUS -> lhsValue + rhsValue;
-            case MINUS -> lhsValue - rhsValue;
-            case MULTIPLY -> lhsValue * rhsValue;
-            case DIVIDE -> lhsValue / rhsValue;
+            case PLUS -> (Long) this.lhs.evaluate(interpreter) + (Long) this.rhs.evaluate(interpreter);
+            case MINUS -> (Long) this.lhs.evaluate(interpreter) - (Long) this.rhs.evaluate(interpreter);
+            case MULTIPLY -> (Long) this.lhs.evaluate(interpreter) * (Long) this.rhs.evaluate(interpreter);
+            case DIVIDE -> (Long) this.lhs.evaluate(interpreter) / (Long) this.rhs.evaluate(interpreter);
+            case AND -> (Boolean) this.lhs.evaluate(interpreter) && (Boolean) this.rhs.evaluate(interpreter);
+            case OR -> (Boolean) this.lhs.evaluate(interpreter) || (Boolean) this.rhs.evaluate(interpreter);
             //Handled by other node
             case EQUALS -> {
                 assert false;
@@ -38,11 +38,13 @@ public class BinaryOperation extends AstNode {
     }
 
     public enum Operator {
-        PLUS("+", 2),
-        MINUS("-", 2),
-        MULTIPLY("*", 3),
-        DIVIDE("/", 3),
+        PLUS("+", 3),
+        MINUS("-", 3),
+        MULTIPLY("*", 4),
+        DIVIDE("/", 4),
         EQUALS("=", 1),
+        AND("&&", 2),
+        OR("||", 2),
         ;
 
         private final String stringValue;

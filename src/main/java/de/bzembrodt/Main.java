@@ -15,7 +15,7 @@ import java.util.List;
 public class Main {
     static void main() throws IOException {
 
-        String fileContent = Files.readString(Path.of("tests/011_boolean.ljff"));
+        String fileContent = Files.readString(Path.of("tests/012_boolean_operators.ljff"));
 
         Lexer lexer = new Lexer();
         List<Token> tokens = lexer.lex(fileContent);

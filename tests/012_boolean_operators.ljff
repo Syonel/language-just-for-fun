@@ -1,0 +1,18 @@
+fn trueFn(): bool {
+    print(1);
+    return true;
+}
+fn falseFn(): bool {
+    print(2);
+    return false;
+}
+
+print(trueFn() && falseFn());
+print(falseFn() && trueFn());
+print(falseFn() && falseFn());
+print(trueFn() && trueFn());
+
+print(trueFn() || falseFn());
+print(falseFn() || trueFn());
+print(falseFn() || falseFn());
+print(trueFn() || trueFn());

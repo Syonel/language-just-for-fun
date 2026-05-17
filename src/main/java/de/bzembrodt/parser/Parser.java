@@ -152,7 +152,7 @@ public class Parser {
     private record OperatorAndToken(BinaryOperation.Operator op, Token token) {
     }
 
-    private static final Set<TokenType> OPERATORS = EnumSet.of(TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.EQUALS);
+    private static final Set<TokenType> OPERATORS = EnumSet.of(TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.EQUALS, TokenType.AMPERSAND, TokenType.PIPE);
 
     private AstNode parseArithmeticExpression(TokenList tokenList) {
         Stack<AstNode> operands = new Stack<>();
@@ -168,6 +168,16 @@ public class Parser {
                 case MINUS -> BinaryOperation.Operator.MINUS;
                 case MULTIPLY -> BinaryOperation.Operator.MULTIPLY;
                 case DIVIDE -> BinaryOperation.Operator.DIVIDE;
+                case AMPERSAND -> {
+                    assert tokenList.peek().type == TokenType.AMPERSAND;
+                    tokenList.advance();
+                    yield BinaryOperation.Operator.AND;
+                }
+                case PIPE -> {
+                    assert tokenList.peek().type == TokenType.PIPE;
+                    tokenList.advance();
+                    yield BinaryOperation.Operator.OR;
+                }
                 case EQUALS -> BinaryOperation.Operator.EQUALS;
                 default -> null;
             };
