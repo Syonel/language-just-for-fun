@@ -137,8 +137,6 @@ public class Parser {
 
         assert tokenList.getToken().type == TokenType.IDENTIFIER;
         String type = tokenList.getToken().value;
-        //TODO For now we only support ints, extend to other types later
-        assert type.equals("int");
         tokenList.advance();
 
         Optional<AstNode> initializer = Optional.empty();
@@ -212,6 +210,11 @@ public class Parser {
         Token token = tokenList.getToken();
         switch (token.type) {
             case IDENTIFIER -> {
+                if (token.value.equals(Keywords.TRUE.name) || token.value.equals(Keywords.FALSE.name)) {
+                    expression = new BoolNode(token.value.equals(Keywords.TRUE.name), token);
+                    tokenList.advance();
+                    break;
+                }
                 assert !RESERVED_WORDS.contains(token.value);
                 if (tokenList.peek().type == TokenType.OPEN_ROUND_BRACKET) {
                     expression = parseFunctionCall(tokenList);

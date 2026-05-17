@@ -9,6 +9,8 @@ public enum Keywords {
     VAR("var"),
     FN("fn"),
     RETURN("return"),
+    TRUE("true"),
+    FALSE("false"),
     ;
 
     public final String name;

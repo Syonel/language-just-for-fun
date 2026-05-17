@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 public enum BuildinTypes {
     INT("int"),
+    BOOL("bool"),
     ;
 
     public final String name;

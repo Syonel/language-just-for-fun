@@ -98,6 +98,13 @@ class TestExamples {
                 "6\n",
                 null
         ));
+        TEST_CASES.add(new TestCase(
+                "011_boolean.ljff",
+                "[IDENTIFIER(const)[1:1], IDENTIFIER(t)[1:7], COLON[1:8], IDENTIFIER(bool)[1:10], EQUALS[1:15], IDENTIFIER(true)[1:17], SEMICOLON[1:21], IDENTIFIER(const)[2:1], IDENTIFIER(f)[2:7], COLON[2:8], IDENTIFIER(bool)[2:10], EQUALS[2:15], IDENTIFIER(false)[2:17], SEMICOLON[2:22], IDENTIFIER(print)[3:1], OPEN_ROUND_BRACKET[3:6], IDENTIFIER(t)[3:7], CLOSE_ROUND_BRACKET[3:8], SEMICOLON[3:9], IDENTIFIER(print)[4:1], OPEN_ROUND_BRACKET[4:6], IDENTIFIER(f)[4:7], CLOSE_ROUND_BRACKET[4:8], SEMICOLON[4:9], EOF[4:10]]",
+                "{\n\tdecl_c['t'] = #true\n\tdecl_c['f'] = #false\n\tcall['print'](@t)\n\tcall['print'](@f)\n}",
+                "true\nfalse\n",
+                null
+        ));
     }
 
     @Test
