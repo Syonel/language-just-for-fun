@@ -11,6 +11,8 @@ public enum Keyword {
     RETURN("return"),
     TRUE("true"),
     FALSE("false"),
+    IF("if"),
+    ELSE("else"),
     ;
 
     public final String name;

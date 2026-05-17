@@ -61,9 +61,18 @@ public class Interpreter {
         return func.body.evaluate(this);
     }
 
+    public void enterScope() {
+        currentScope = new Scope(Optional.of(currentScope), currentScope.callerScope);
+    }
+
+    public void exitScope() {
+        assert currentScope.parentScope.isPresent();
+        currentScope = currentScope.parentScope.get();
+    }
+
     private RuntimeValue intrinsicPrint(List<RuntimeValue> args) {
         assert args.size() == 1;
-        printer.accept(args.get(0).value + "\n");
+        printer.accept(args.getFirst().value + "\n");
         return null;
     }
 

@@ -52,6 +52,19 @@ public class Parser {
             } else {
                 statement = new ReturnNode(Optional.of(parseArithmeticExpression(tokenList)), token);
             }
+        } else if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keyword.IF.name)) {
+            Token token = tokenList.getToken();
+            tokenList.advance();
+            AstNode condition = parseArithmeticExpression(tokenList);
+            List<AstNode> trueBlock = parseBlock(tokenList);
+            Optional<List<AstNode>> falseBlock = Optional.empty();
+            if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keyword.ELSE.name)) {
+                tokenList.advance();
+                falseBlock = Optional.of(parseBlock(tokenList));
+            }
+            statement = new IfNode(condition, new StatementsNode(trueBlock), falseBlock.map(StatementsNode::new), token);
+            needsSemicolon = false;
+
         } else {
             statement = parseArithmeticExpression(tokenList);
         }
@@ -104,6 +117,14 @@ public class Parser {
         String returnType = tokenList.getToken().value;
         tokenList.advance();
 
+        List<AstNode> statements = parseBlock(tokenList);
+        //Add an empty return statement in case the function did not have one
+        statements.add(new ReturnNode(Optional.empty(), tokenList.getToken()));
+
+        return new FunctionDefinitionNode(name, returnType, arguments, new StatementsNode(statements), token);
+    }
+
+    private List<AstNode> parseBlock(TokenList tokenList) {
         assert tokenList.getToken().type == TokenType.OPEN_CURLY_BRACKET;
         tokenList.advance();
 
@@ -115,11 +136,8 @@ public class Parser {
             }
         }
         assert tokenList.getToken().type == TokenType.CLOSE_CURLY_BRACKET;
-        //Add an empty return statement in case the function did not have one
-        statements.add(new ReturnNode(Optional.empty(), tokenList.getToken()));
         tokenList.advance();
-
-        return new FunctionDefinitionNode(name, returnType, arguments, new StatementsNode(statements), token);
+        return statements;
     }
 
     private AstNode parseVariableDeclaration(TokenList tokenList) {

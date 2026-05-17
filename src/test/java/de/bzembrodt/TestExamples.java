@@ -126,6 +126,13 @@ class TestExamples {
                 "true\nfalse\nfalse\nfalse\nfalse\ntrue\ntrue\ntrue\nfalse\nfalse\ntrue\ntrue\nfalse\ntrue\nfalse\ntrue\nfalse\ntrue\n",
                 null
         ));
+        TEST_CASES.add(new TestCase(
+                "015_if_else.ljff",
+                "[IDENTIFIER(if)[1:1], NUMBER(1)[1:4], LESS_THAN[1:6], NUMBER(2)[1:8], OPEN_CURLY_BRACKET[1:10], IDENTIFIER(print)[2:5], OPEN_ROUND_BRACKET[2:10], NUMBER(1)[2:11], CLOSE_ROUND_BRACKET[2:12], SEMICOLON[2:13], CLOSE_CURLY_BRACKET[3:1], IDENTIFIER(if)[5:1], NUMBER(1)[5:4], GREATER_THAN[5:6], NUMBER(2)[5:8], OPEN_CURLY_BRACKET[5:10], IDENTIFIER(print)[6:5], OPEN_ROUND_BRACKET[6:10], NUMBER(2)[6:11], CLOSE_ROUND_BRACKET[6:12], SEMICOLON[6:13], CLOSE_CURLY_BRACKET[7:1], IDENTIFIER(if)[10:1], NUMBER(1)[10:4], LESS_THAN[10:6], NUMBER(2)[10:8], OPEN_CURLY_BRACKET[10:10], IDENTIFIER(print)[11:5], OPEN_ROUND_BRACKET[11:10], NUMBER(3)[11:11], CLOSE_ROUND_BRACKET[11:12], SEMICOLON[11:13], CLOSE_CURLY_BRACKET[12:1], IDENTIFIER(else)[12:3], OPEN_CURLY_BRACKET[12:8], IDENTIFIER(print)[13:5], OPEN_ROUND_BRACKET[13:10], NUMBER(4)[13:11], CLOSE_ROUND_BRACKET[13:12], SEMICOLON[13:13], CLOSE_CURLY_BRACKET[14:1], IDENTIFIER(if)[16:1], NUMBER(1)[16:4], GREATER_THAN[16:6], NUMBER(2)[16:8], OPEN_CURLY_BRACKET[16:10], IDENTIFIER(print)[17:5], OPEN_ROUND_BRACKET[17:10], NUMBER(5)[17:11], CLOSE_ROUND_BRACKET[17:12], SEMICOLON[17:13], CLOSE_CURLY_BRACKET[18:1], IDENTIFIER(else)[18:3], OPEN_CURLY_BRACKET[18:8], IDENTIFIER(print)[19:5], OPEN_ROUND_BRACKET[19:10], NUMBER(6)[19:11], CLOSE_ROUND_BRACKET[19:12], SEMICOLON[19:13], CLOSE_CURLY_BRACKET[20:1], EOF[20:2]]",
+                "{\n\tif((#1 < #2)) = {\n\tcall['print'](#1)\n}\n\tif((#1 > #2)) = {\n\tcall['print'](#2)\n}\n\tif((#1 < #2)) = {\n\tcall['print'](#3)\n}\n\tif((#1 > #2)) = {\n\tcall['print'](#5)\n}\n}",
+                "1\n3\n6\n",
+                null
+        ));
     }
 
     @Test

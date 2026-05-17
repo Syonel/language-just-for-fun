@@ -7,7 +7,7 @@ import java.util.Optional;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class Scope {
     private final Map<String, RuntimeVariable> variables = new HashMap<>();
-    private final Optional<Scope> parentScope;
+    public final Optional<Scope> parentScope;
     public final Optional<Scope> callerScope;
 
     public Scope(Optional<Scope> parentScope, Optional<Scope> callerScope) {
