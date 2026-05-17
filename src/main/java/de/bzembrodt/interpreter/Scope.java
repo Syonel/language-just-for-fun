@@ -6,7 +6,7 @@ import java.util.Optional;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class Scope {
-    private final Map<String, RuntimeValue> variables = new HashMap<>();
+    private final Map<String, RuntimeVariable> variables = new HashMap<>();
     private final Optional<Scope> parentScope;
     public final Optional<Scope> callerScope;
 
@@ -25,11 +25,11 @@ public class Scope {
         return false;
     }
 
-    public void setVariable(String name, RuntimeValue value) {
+    public void setVariable(String name, RuntimeVariable value) {
         variables.put(name, value);
     }
 
-    public RuntimeValue getVariable(String name) {
+    public RuntimeVariable getVariable(String name) {
         if (variables.containsKey(name)) {
             return variables.get(name);
         }

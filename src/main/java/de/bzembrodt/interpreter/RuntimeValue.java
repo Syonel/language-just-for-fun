@@ -1,14 +1,10 @@
 package de.bzembrodt.interpreter;
 
 public class RuntimeValue {
-    public final String type;
-    public final boolean isConst;
-    public boolean isInitialized;
-    public Object value;
+    public final RuntimeType type;
+    public final Object value;
 
-    public RuntimeValue(String type, boolean isConst, boolean isInitialized, Object value) {
-        this.isInitialized = isInitialized;
-        this.isConst = isConst;
+    public RuntimeValue(RuntimeType type, Object value) {
         this.type = type;
         this.value = value;
     }

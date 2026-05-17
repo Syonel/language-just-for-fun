@@ -1,6 +1,8 @@
 package de.bzembrodt.parser.node;
 
 import de.bzembrodt.interpreter.Interpreter;
+import de.bzembrodt.interpreter.RuntimeType;
+import de.bzembrodt.interpreter.RuntimeValue;
 import de.bzembrodt.lexer.Token;
 
 import java.util.Optional;
@@ -21,8 +23,9 @@ public class VariableDeclarationNode extends AstNode {
     }
 
     @Override
-    public Object evaluate(Interpreter interpreter) {
-        interpreter.declareVariable(name, type, isConst, initializer.map(i -> i.evaluate(interpreter)));
+    public RuntimeValue evaluate(Interpreter interpreter) {
+        RuntimeType runtimeType = interpreter.getRuntimeType(type);
+        interpreter.declareVariable(name, runtimeType, isConst, initializer.map(i -> i.evaluate(interpreter)));
         return null;
     }
 

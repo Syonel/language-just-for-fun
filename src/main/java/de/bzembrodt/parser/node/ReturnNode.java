@@ -1,6 +1,7 @@
 package de.bzembrodt.parser.node;
 
 import de.bzembrodt.interpreter.Interpreter;
+import de.bzembrodt.interpreter.RuntimeValue;
 import de.bzembrodt.lexer.Token;
 
 import java.util.Optional;
@@ -15,7 +16,7 @@ public class ReturnNode extends AstNode {
     }
 
     @Override
-    public Object evaluate(Interpreter interpreter) {
+    public RuntimeValue evaluate(Interpreter interpreter) {
         interpreter.funcReturn(value.map(v -> v.evaluate(interpreter)).orElse(null));
         return null;
     }

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public enum Keywords {
+public enum Keyword {
     CONST("const"),
     VAR("var"),
     FN("fn"),
@@ -15,9 +15,9 @@ public enum Keywords {
 
     public final String name;
 
-    Keywords(String name) {
+    Keyword(String name) {
         this.name = name;
     }
 
-    public static final Set<String> ALL_KEYWORDS = Arrays.stream(values()).map(Keywords::name).collect(Collectors.toSet());
+    public static final Set<String> ALL_KEYWORDS = Arrays.stream(values()).map(Keyword::name).collect(Collectors.toSet());
 }

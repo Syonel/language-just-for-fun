@@ -1,6 +1,7 @@
 package de.bzembrodt.parser.node;
 
 import de.bzembrodt.interpreter.Interpreter;
+import de.bzembrodt.interpreter.RuntimeValue;
 import de.bzembrodt.lexer.Token;
 
 import java.util.List;
@@ -17,8 +18,8 @@ public class FunctionCallNode extends AstNode {
     }
 
     @Override
-    public Object evaluate(Interpreter interpreter) {
-        List<Object> args = arguments.stream().map(a -> a.evaluate(interpreter)).toList();
+    public RuntimeValue evaluate(Interpreter interpreter) {
+        List<RuntimeValue> args = arguments.stream().map(a -> a.evaluate(interpreter)).toList();
 
         return interpreter.call(name, args);
     }

@@ -1,6 +1,8 @@
 package de.bzembrodt.parser.node;
 
 import de.bzembrodt.interpreter.Interpreter;
+import de.bzembrodt.interpreter.RuntimeFunctionType;
+import de.bzembrodt.interpreter.RuntimeValue;
 import de.bzembrodt.lexer.Token;
 
 import java.util.List;
@@ -22,9 +24,10 @@ public class FunctionDefinitionNode extends AstNode {
     }
 
     @Override
-    public Object evaluate(Interpreter interpreter) {
+    public RuntimeValue evaluate(Interpreter interpreter) {
         //TODO get correct type for function
-        interpreter.declareVariable(name, "func", true, Optional.of(this));
+        RuntimeFunctionType type = new RuntimeFunctionType(interpreter.getRuntimeType(returnType), arguments.stream().map(a -> interpreter.getRuntimeType(a.type)).toList());
+        interpreter.declareVariable(name, type, true, Optional.of(new RuntimeValue(type, this)));
         return null;
     }
 

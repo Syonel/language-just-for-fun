@@ -1,6 +1,7 @@
 package de.bzembrodt.parser.node;
 
 import de.bzembrodt.interpreter.Interpreter;
+import de.bzembrodt.interpreter.RuntimeValue;
 import de.bzembrodt.lexer.Token;
 
 public abstract class AstNode {
@@ -11,6 +12,6 @@ public abstract class AstNode {
         this.token = token;
     }
 
-    public abstract Object evaluate(Interpreter interpreter);
+    public abstract RuntimeValue evaluate(Interpreter interpreter);
     public abstract String toString();
 }

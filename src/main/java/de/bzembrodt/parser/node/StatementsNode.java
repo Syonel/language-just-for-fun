@@ -1,6 +1,7 @@
 package de.bzembrodt.parser.node;
 
 import de.bzembrodt.interpreter.Interpreter;
+import de.bzembrodt.interpreter.RuntimeValue;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,7 +16,7 @@ public class StatementsNode extends AstNode {
     }
 
     @Override
-    public Object evaluate(Interpreter interpreter) {
+    public RuntimeValue evaluate(Interpreter interpreter) {
         for (AstNode statement : statements) {
             statement.evaluate(interpreter);
             if (interpreter.shouldReturn()) {

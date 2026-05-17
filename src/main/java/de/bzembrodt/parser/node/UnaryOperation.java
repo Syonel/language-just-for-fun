@@ -1,6 +1,8 @@
 package de.bzembrodt.parser.node;
 
 import de.bzembrodt.interpreter.Interpreter;
+import de.bzembrodt.interpreter.RuntimeBuildinType;
+import de.bzembrodt.interpreter.RuntimeValue;
 import de.bzembrodt.lexer.Token;
 
 public class UnaryOperation extends AstNode {
@@ -14,11 +16,17 @@ public class UnaryOperation extends AstNode {
     }
 
     @Override
-    public Object evaluate(Interpreter interpreter) {
-        Object rhsValue = this.rhs.evaluate(interpreter);
+    public RuntimeValue evaluate(Interpreter interpreter) {
+        RuntimeValue rhsValue = this.rhs.evaluate(interpreter);
         return switch (operator) {
-            case NEGATE -> -(Long) rhsValue;
-            case NOT -> !(Boolean) rhsValue;
+            case NEGATE -> {
+                assert rhsValue.type.equals(RuntimeBuildinType.INT);
+                yield new RuntimeValue(RuntimeBuildinType.INT, -(Long) rhsValue.value);
+            }
+            case NOT -> {
+                assert rhsValue.type.equals(RuntimeBuildinType.BOOL);
+                yield new RuntimeValue(RuntimeBuildinType.BOOL, !(Boolean) rhsValue.value);
+            }
         };
     }
 

@@ -1,6 +1,7 @@
 package de.bzembrodt.parser.node;
 
 import de.bzembrodt.interpreter.Interpreter;
+import de.bzembrodt.interpreter.RuntimeValue;
 import de.bzembrodt.lexer.Token;
 
 public class NameLookupNode extends AstNode {
@@ -12,7 +13,7 @@ public class NameLookupNode extends AstNode {
     }
 
     @Override
-    public Object evaluate(Interpreter interpreter) {
+    public RuntimeValue evaluate(Interpreter interpreter) {
         return interpreter.lookupVariable(name);
     }
 

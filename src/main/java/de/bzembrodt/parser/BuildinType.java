@@ -4,16 +4,16 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public enum BuildinTypes {
+public enum BuildinType {
     INT("int"),
     BOOL("bool"),
     ;
 
     public final String name;
 
-    BuildinTypes(String name) {
+    BuildinType(String name) {
         this.name = name;
     }
 
-    public static final Set<String> ALL_BUILDIN_TYPES = Arrays.stream(values()).map(BuildinTypes::name).collect(Collectors.toSet());
+    public static final Set<String> ALL_BUILDIN_TYPES = Arrays.stream(values()).map(BuildinType::name).collect(Collectors.toSet());
 }

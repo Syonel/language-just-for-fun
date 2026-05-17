@@ -1,6 +1,8 @@
 package de.bzembrodt.parser.node;
 
 import de.bzembrodt.interpreter.Interpreter;
+import de.bzembrodt.interpreter.RuntimeBuildinType;
+import de.bzembrodt.interpreter.RuntimeValue;
 import de.bzembrodt.lexer.Token;
 
 public class BoolNode extends AstNode {
@@ -12,8 +14,8 @@ public class BoolNode extends AstNode {
     }
 
     @Override
-    public Object evaluate(Interpreter interpreter) {
-        return value;
+    public RuntimeValue evaluate(Interpreter interpreter) {
+        return new RuntimeValue(RuntimeBuildinType.BOOL, value);
     }
 
     @Override

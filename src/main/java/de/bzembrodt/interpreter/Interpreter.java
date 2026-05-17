@@ -1,9 +1,8 @@
 package de.bzembrodt.interpreter;
 
+import de.bzembrodt.parser.BuildinType;
 import de.bzembrodt.parser.node.AstNode;
 import de.bzembrodt.parser.node.FunctionDefinitionNode;
-import de.bzembrodt.parser.node.ReturnNode;
-import de.bzembrodt.parser.node.StatementsNode;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +15,7 @@ public class Interpreter {
     private final Scope globalScope = new Scope(Optional.empty(), Optional.empty());
     private Scope currentScope = globalScope;
     private boolean shouldReturn = false;
-    private Object returnValue;
+    private RuntimeValue returnValue;
 
     public Interpreter() {
         printer = IO::print;
@@ -29,39 +28,32 @@ public class Interpreter {
     }
 
     private void init() {
-        FunctionDefinitionNode printNode = new FunctionDefinitionNode("print", "void", List.of(new FunctionDefinitionNode.Argument("value", "string")), new StatementsNode(List.of(new AstNode(null) {
-            @Override
-            public Object evaluate(Interpreter interpreter) {
-                printer.accept(interpreter.lookupVariable("value") + "\n");
-                return null;
-            }
-
-            @Override
-            public String toString() {
-                return "__intrinsic_print__";
-            }
-        }, new ReturnNode(Optional.empty(), null))), null);
-        printNode.evaluate(this);
+        globalScope.setVariable("print", new RuntimeVariable(null, true, true, new RuntimeValue(null, new IntrinsicFunction(this::intrinsicPrint))));
     }
 
-    public Object interpret(AstNode programNode) {
+    public RuntimeValue interpret(AstNode programNode) {
         return programNode.evaluate(this);
     }
 
-    public Object call(String name, List<Object> args) {
+    public RuntimeValue call(String name, List<RuntimeValue> args) {
         assert currentScope.hasVariable(name, true);
 
-        RuntimeValue runtimeValue = currentScope.getVariable(name);
-        assert runtimeValue.value instanceof FunctionDefinitionNode;
+        RuntimeVariable variable = currentScope.getVariable(name);
+        if (variable.value.value instanceof IntrinsicFunction) {
+            return ((IntrinsicFunction) variable.value.value).call(args);
+        }
+        assert variable.type instanceof RuntimeFunctionType;
+        assert variable.value.value instanceof FunctionDefinitionNode;
 
-        FunctionDefinitionNode func = (FunctionDefinitionNode) runtimeValue.value;
+        FunctionDefinitionNode func = (FunctionDefinitionNode) variable.value.value;
         assert func.arguments.size() == args.size();
         currentScope = new Scope(Optional.of(globalScope), Optional.of(currentScope));
         for (int i = 0; i < args.size(); i++) {
-            Object argValue = args.get(i);
+            RuntimeValue argValue = args.get(i);
             String argName = func.arguments.get(i).name();
-            //TODO Check for matching types
-            String argType = func.arguments.get(i).type();
+
+            RuntimeType argType = getRuntimeType(func.arguments.get(i).type());
+            assert argType.equals(argValue.type);
 
             declareVariable(argName, argType, false, Optional.of(argValue));
         }
@@ -69,41 +61,62 @@ public class Interpreter {
         return func.body.evaluate(this);
     }
 
-    public void declareVariable(String name, String type, boolean isConst, Optional<Object> value) {
+    private RuntimeValue intrinsicPrint(List<RuntimeValue> args) {
+        assert args.size() == 1;
+        printer.accept(args.get(0).value + "\n");
+        return null;
+    }
+
+    public RuntimeType getRuntimeType(String type) {
+        for (BuildinType value : BuildinType.values()) {
+            if (value.name.equals(type)) {
+                return RuntimeBuildinType.forType(value);
+            }
+        }
+        //Only buildin types for now
+        assert false;
+        return null;
+    }
+
+    public void declareVariable(String name, RuntimeType type, boolean isConst, Optional<RuntimeValue> value) {
         assert !currentScope.hasVariable(name, false);
-        currentScope.setVariable(name, new RuntimeValue(type, isConst, value.isPresent(), value.orElse(null)));
+        if (value.isPresent()) {
+            assert type.equals(value.get().type);
+        }
+        currentScope.setVariable(name, new RuntimeVariable(type, isConst, value.isPresent(), value.orElse(null)));
     }
 
-    public void assignVariable(String name, Object value) {
+    public void assignVariable(String name, RuntimeValue value) {
         assert currentScope.hasVariable(name, true);
 
-        RuntimeValue runtimeValue = currentScope.getVariable(name);
-        assert !runtimeValue.isConst;
+        RuntimeVariable variable = currentScope.getVariable(name);
+        assert !variable.isConst;
+        assert variable.type.equals(value.type);
 
-        runtimeValue.value = value;
-        runtimeValue.isInitialized = true;
+        variable.value = value;
+        variable.isInitialized = true;
     }
 
-    public Object lookupVariable(String name) {
+    public RuntimeValue lookupVariable(String name) {
         assert currentScope.hasVariable(name, true);
-        RuntimeValue value = currentScope.getVariable(name);
+        RuntimeVariable value = currentScope.getVariable(name);
         assert value != null;
         assert value.isInitialized;
 
         return value.value;
     }
 
-    public void funcReturn(Object o) {
+    public void funcReturn(RuntimeValue value) {
         shouldReturn = true;
-        returnValue = o;
+        returnValue = value;
     }
 
     public boolean shouldReturn() {
         return shouldReturn;
     }
 
-    public Object doReturn() {
-        Object result = returnValue;
+    public RuntimeValue doReturn() {
+        RuntimeValue result = returnValue;
         shouldReturn = false;
         returnValue = null;
         assert currentScope.callerScope.isPresent();

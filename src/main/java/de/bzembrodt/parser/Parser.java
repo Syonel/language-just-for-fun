@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 public class Parser {
 
-    private static final Set<String> RESERVED_WORDS = Stream.concat(Keywords.ALL_KEYWORDS.stream(), BuildinTypes.ALL_BUILDIN_TYPES.stream()).collect(Collectors.toSet());
+    private static final Set<String> RESERVED_WORDS = Stream.concat(Keyword.ALL_KEYWORDS.stream(), BuildinType.ALL_BUILDIN_TYPES.stream()).collect(Collectors.toSet());
 
     public AstNode parse(List<Token> tokens) {
 
@@ -38,12 +38,12 @@ public class Parser {
         }
         boolean needsSemicolon = true;
         AstNode statement;
-        if (tokenList.getToken().type == TokenType.IDENTIFIER && (tokenList.getToken().value.equals(Keywords.CONST.name) || tokenList.getToken().value.equals(Keywords.VAR.name))) {
+        if (tokenList.getToken().type == TokenType.IDENTIFIER && (tokenList.getToken().value.equals(Keyword.CONST.name) || tokenList.getToken().value.equals(Keyword.VAR.name))) {
             statement = parseVariableDeclaration(tokenList);
-        } else if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keywords.FN.name)) {
+        } else if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keyword.FN.name)) {
             statement = parseFunctionDefinition(tokenList);
             needsSemicolon = false;
-        } else if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keywords.RETURN.name)) {
+        } else if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keyword.RETURN.name)) {
             //TODO Return is only valid within a function
             Token token = tokenList.getToken();
             tokenList.advance();
@@ -64,7 +64,7 @@ public class Parser {
 
     private AstNode parseFunctionDefinition(TokenList tokenList) {
         Token token = tokenList.getToken();
-        assert token.type == TokenType.IDENTIFIER && token.value.equals(Keywords.FN.name);
+        assert token.type == TokenType.IDENTIFIER && token.value.equals(Keyword.FN.name);
         tokenList.advance();
 
         assert tokenList.getToken().type == TokenType.IDENTIFIER;
@@ -124,8 +124,8 @@ public class Parser {
 
     private AstNode parseVariableDeclaration(TokenList tokenList) {
         Token token = tokenList.getToken();
-        assert token.type == TokenType.IDENTIFIER && (token.value.equals(Keywords.CONST.name) || token.value.equals(Keywords.VAR.name));
-        boolean isConst = token.value.equals(Keywords.CONST.name);
+        assert token.type == TokenType.IDENTIFIER && (token.value.equals(Keyword.CONST.name) || token.value.equals(Keyword.VAR.name));
+        boolean isConst = token.value.equals(Keyword.CONST.name);
         tokenList.advance();
 
         assert tokenList.getToken().type == TokenType.IDENTIFIER;
@@ -245,8 +245,8 @@ public class Parser {
         Token token = tokenList.getToken();
         switch (token.type) {
             case IDENTIFIER -> {
-                if (token.value.equals(Keywords.TRUE.name) || token.value.equals(Keywords.FALSE.name)) {
-                    expression = new BoolNode(token.value.equals(Keywords.TRUE.name), token);
+                if (token.value.equals(Keyword.TRUE.name) || token.value.equals(Keyword.FALSE.name)) {
+                    expression = new BoolNode(token.value.equals(Keyword.TRUE.name), token);
                     tokenList.advance();
                     break;
                 }

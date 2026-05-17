@@ -1,6 +1,7 @@
 package de.bzembrodt.parser.node;
 
 import de.bzembrodt.interpreter.Interpreter;
+import de.bzembrodt.interpreter.RuntimeValue;
 import de.bzembrodt.lexer.Token;
 
 public class VariableAssignmentNode extends AstNode {
@@ -16,8 +17,8 @@ public class VariableAssignmentNode extends AstNode {
     }
 
     @Override
-    public Object evaluate(Interpreter interpreter) {
-        Object value = rhs.evaluate(interpreter);
+    public RuntimeValue evaluate(Interpreter interpreter) {
+        RuntimeValue value = rhs.evaluate(interpreter);
         interpreter.assignVariable(name, value);
         return value;
     }
