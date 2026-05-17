@@ -152,7 +152,7 @@ public class Parser {
     private record OperatorAndToken(BinaryOperation.Operator op, Token token) {
     }
 
-    private static final Set<TokenType> OPERATORS = EnumSet.of(TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.EQUALS, TokenType.AMPERSAND, TokenType.PIPE);
+    private static final Set<TokenType> OPERATORS = EnumSet.of(TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.EQUALS, TokenType.AMPERSAND, TokenType.PIPE, TokenType.LESS_THAN, TokenType.GREATER_THAN, TokenType.EXCLAMATION_MARK);
 
     private AstNode parseArithmeticExpression(TokenList tokenList) {
         Stack<AstNode> operands = new Stack<>();
@@ -178,7 +178,32 @@ public class Parser {
                     tokenList.advance();
                     yield BinaryOperation.Operator.OR;
                 }
-                case EQUALS -> BinaryOperation.Operator.EQUALS;
+                case LESS_THAN -> {
+                    if (tokenList.peek().type == TokenType.EQUALS) {
+                        tokenList.advance();
+                        yield BinaryOperation.Operator.LESS_EQUAL;
+                    }
+                    yield BinaryOperation.Operator.LESS_THAN;
+                }
+                case GREATER_THAN -> {
+                    if (tokenList.peek().type == TokenType.EQUALS) {
+                        tokenList.advance();
+                        yield BinaryOperation.Operator.GREATER_EQUAL;
+                    }
+                    yield BinaryOperation.Operator.GREATER_THAN;
+                }
+                case EQUALS -> {
+                    if (tokenList.peek().type == TokenType.EQUALS) {
+                        tokenList.advance();
+                        yield BinaryOperation.Operator.EQUAL;
+                    }
+                    yield BinaryOperation.Operator.ASSIGN;
+                }
+                case EXCLAMATION_MARK -> {
+                    assert tokenList.peek().type == TokenType.EQUALS;
+                    tokenList.advance();
+                    yield BinaryOperation.Operator.NOT_EQUAL;
+                }
                 default -> null;
             };
             assert binOp != null;
@@ -205,7 +230,7 @@ public class Parser {
         AstNode rhs = operands.pop();
         AstNode lhs = operands.pop();
         OperatorAndToken opAndToken = operators.pop();
-        if (opAndToken.op == BinaryOperation.Operator.EQUALS) {
+        if (opAndToken.op == BinaryOperation.Operator.ASSIGN) {
             assert lhs instanceof NameLookupNode;
             NameLookupNode lhsName = (NameLookupNode) lhs;
             operands.push(new VariableAssignmentNode(lhsName.name, rhs, opAndToken.token));

@@ -15,7 +15,7 @@ import java.util.List;
 public class Main {
     static void main() throws IOException {
 
-        String fileContent = Files.readString(Path.of("tests/013_unary_operators.ljff"));
+        String fileContent = Files.readString(Path.of("tests/014_comparative_operators.ljff"));
 
         Lexer lexer = new Lexer();
         List<Token> tokens = lexer.lex(fileContent);

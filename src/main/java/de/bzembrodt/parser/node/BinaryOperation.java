@@ -18,14 +18,20 @@ public class BinaryOperation extends AstNode {
     @Override
     public Object evaluate(Interpreter interpreter) {
         return switch (operator) {
-            case PLUS -> (Long) this.lhs.evaluate(interpreter) + (Long) this.rhs.evaluate(interpreter);
-            case MINUS -> (Long) this.lhs.evaluate(interpreter) - (Long) this.rhs.evaluate(interpreter);
             case MULTIPLY -> (Long) this.lhs.evaluate(interpreter) * (Long) this.rhs.evaluate(interpreter);
             case DIVIDE -> (Long) this.lhs.evaluate(interpreter) / (Long) this.rhs.evaluate(interpreter);
+            case PLUS -> (Long) this.lhs.evaluate(interpreter) + (Long) this.rhs.evaluate(interpreter);
+            case MINUS -> (Long) this.lhs.evaluate(interpreter) - (Long) this.rhs.evaluate(interpreter);
+            case LESS_THAN -> (Long) this.lhs.evaluate(interpreter) < (Long) this.rhs.evaluate(interpreter);
+            case GREATER_THAN -> (Long) this.lhs.evaluate(interpreter) > (Long) this.rhs.evaluate(interpreter);
+            case LESS_EQUAL -> (Long) this.lhs.evaluate(interpreter) <= (Long) this.rhs.evaluate(interpreter);
+            case GREATER_EQUAL -> (Long) this.lhs.evaluate(interpreter) >= (Long) this.rhs.evaluate(interpreter);
+            case EQUAL -> ((Long) this.lhs.evaluate(interpreter)).equals((Long) this.rhs.evaluate(interpreter));
+            case NOT_EQUAL -> !((Long) this.lhs.evaluate(interpreter)).equals((Long) this.rhs.evaluate(interpreter));
             case AND -> (Boolean) this.lhs.evaluate(interpreter) && (Boolean) this.rhs.evaluate(interpreter);
             case OR -> (Boolean) this.lhs.evaluate(interpreter) || (Boolean) this.rhs.evaluate(interpreter);
             //Handled by other node
-            case EQUALS -> {
+            case ASSIGN -> {
                 assert false;
                 yield null;
             }
@@ -38,13 +44,19 @@ public class BinaryOperation extends AstNode {
     }
 
     public enum Operator {
-        PLUS("+", 3),
-        MINUS("-", 3),
-        MULTIPLY("*", 4),
-        DIVIDE("/", 4),
-        EQUALS("=", 1),
+        MULTIPLY("*", 5),
+        DIVIDE("/", 5),
+        PLUS("+", 4),
+        MINUS("-", 4),
+        LESS_THAN("<", 3),
+        GREATER_THAN(">", 3),
+        LESS_EQUAL("<=", 3),
+        GREATER_EQUAL(">=", 3),
+        EQUAL("==", 3),
+        NOT_EQUAL("!=", 3),
         AND("&&", 2),
         OR("||", 2),
+        ASSIGN("=", 1),
         ;
 
         private final String stringValue;

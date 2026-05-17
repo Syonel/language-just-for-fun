@@ -22,6 +22,8 @@ public enum TokenType {
     AMPERSAND('&'),
     PIPE('|'),
     EXCLAMATION_MARK('!'),
+    LESS_THAN('<'),
+    GREATER_THAN('>'),
     EOF(_ -> false, (_, _) -> false);
 
     public final Predicate<Character> matchesFunc;
