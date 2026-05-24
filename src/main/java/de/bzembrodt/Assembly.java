@@ -413,14 +413,12 @@ public class Assembly {
     private static void writeExe() throws IOException {
         File file = Path.of("asm/generated.exe").toFile();
         file.createNewFile();
-        long numberOfSections = 4;
+        long numberOfSections = 3;
 
         List<Long> code = CODE;
         if (true) {
 
             code = generateCode();
-
-            assert CODE.size() == code.size();
         }
 
         Map<Field, long[]> dosHeaderValues = new HashMap<>();
@@ -443,7 +441,7 @@ public class Assembly {
         Map<Field, long[]> optionalHeaderValues = new HashMap<>();
         optionalHeaderValues.put(getField("Magic", OPTIONAL_HEADER), new long[]{0x20B});//PE32+
         optionalHeaderValues.put(getField("SizeOfCode", OPTIONAL_HEADER), new long[]{0x200});
-        optionalHeaderValues.put(getField("SizeOfInitializedData", OPTIONAL_HEADER), new long[]{0x600});
+        optionalHeaderValues.put(getField("SizeOfInitializedData", OPTIONAL_HEADER), new long[]{0x400});
         optionalHeaderValues.put(getField("AddressOfEntryPoint", OPTIONAL_HEADER), new long[]{0x1000});
         optionalHeaderValues.put(getField("BaseOfCode", OPTIONAL_HEADER), new long[]{0x1000});
         optionalHeaderValues.put(getField("ImageBase", OPTIONAL_HEADER), new long[]{0x140000000L});
@@ -451,7 +449,7 @@ public class Assembly {
         optionalHeaderValues.put(getField("FileAlignment", OPTIONAL_HEADER), new long[]{0x200});
         optionalHeaderValues.put(getField("MajorOperatingSystemVersion", OPTIONAL_HEADER), new long[]{0x6}); //Seems to be vista?
         optionalHeaderValues.put(getField("MajorSubsystemVersion", OPTIONAL_HEADER), new long[]{0x6});
-        optionalHeaderValues.put(getField("SizeOfImage", OPTIONAL_HEADER), new long[]{0x5000});
+        optionalHeaderValues.put(getField("SizeOfImage", OPTIONAL_HEADER), new long[]{0x4000});
         optionalHeaderValues.put(getField("SizeOfHeaders", OPTIONAL_HEADER), new long[]{0x400});
         optionalHeaderValues.put(getField("Subsystem", OPTIONAL_HEADER), new long[]{3});//Console
         optionalHeaderValues.put(getField("DllCharacteristics", OPTIONAL_HEADER), new long[]{0x20 | 0x40 | 0x100 | 0x8000});//IMAGE_DLLCHARACTERISTICS_HIGH_ENTROPY_VA | IMAGE_DLLCHARACTERISTICS_DYNAMIC_BASE | IMAGE_DLLCHARACTERISTICS_NX_COMPAT | IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE
@@ -462,8 +460,6 @@ public class Assembly {
         optionalHeaderValues.put(getField("NumberOfRvaAndSizes", OPTIONAL_HEADER), new long[]{DATA_DIRECTORIES.size() / 2});
 
         long rDataBase = 0x2000;
-        long relocBase = 0x4000;
-        int relocLength = 12;
         Map<Field, long[]> dataDirectoriesValues = new HashMap<>();
         dataDirectoriesValues.put(getField("IAT (Address)", DATA_DIRECTORIES), new long[]{rDataBase});
         long iatSize = (IMPORTED_FUNCTIONS.size() + 1) * 8L;
@@ -471,8 +467,6 @@ public class Assembly {
         dataDirectoriesValues.put(getField("Import Table (Address)", DATA_DIRECTORIES), new long[]{rDataBase + iatSize});
         long iltSize = getSize(IMAGE_IMPORT_DESCRIPTOR) * 2L;
         dataDirectoriesValues.put(getField("Import Table (Size)", DATA_DIRECTORIES), new long[]{iltSize});
-        dataDirectoriesValues.put(getField("Base Relocation Table (Address)", DATA_DIRECTORIES), new long[]{relocBase});
-        dataDirectoriesValues.put(getField("Base Relocation Table (Size)", DATA_DIRECTORIES), new long[]{relocLength});
 
         Map<Field, long[]> textSectionHeaderValues = new HashMap<>();
         textSectionHeaderValues.put(getField("Name", SECTION), new long[]{0x747865742EL});//.text
@@ -499,15 +493,6 @@ public class Assembly {
         dataSectionHeaderValues.put(getField("SizeOfRawData", SECTION), new long[]{0x200});
         dataSectionHeaderValues.put(getField("PointerToRawData", SECTION), new long[]{0x800});
         dataSectionHeaderValues.put(getField("Characteristics", SECTION), new long[]{0x00000040 | 0x40000000 | 0x80000000}); // IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_WRITE
-
-        Map<Field, long[]> relocSectionHeaderValues = new HashMap<>();
-        relocSectionHeaderValues.put(getField("Name", SECTION), new long[]{0x636F6C65722EL});//.data
-        relocSectionHeaderValues.put(getField("VirtualSize", SECTION), new long[]{relocLength});
-        relocSectionHeaderValues.put(getField("VirtualAddress", SECTION), new long[]{relocBase});
-        relocSectionHeaderValues.put(getField("SizeOfRawData", SECTION), new long[]{0x200});
-        relocSectionHeaderValues.put(getField("PointerToRawData", SECTION), new long[]{0xA00});
-        relocSectionHeaderValues.put(getField("Characteristics", SECTION), new long[]{0x00000040 | 0x40000000 | 0x02000000}); // IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_DISCARDABLE
-
 
         long[] iat = new long[IMPORTED_FUNCTIONS.size() + 1];
         long offset = rDataBase + iatSize * 2 + iltSize;
@@ -536,11 +521,10 @@ public class Assembly {
             writeFields(SECTION, textSectionHeaderValues, outputStream);
             writeFields(SECTION, rDataSectionHeaderValues, outputStream);
             writeFields(SECTION, dataSectionHeaderValues, outputStream);
-            writeFields(SECTION, relocSectionHeaderValues, outputStream);
 
 
             //Pad to next section
-            int headerSize = getSize(DOS_HEADER) + DOS_STUB.length + getSize(COFF_HEADER) + getSize(OPTIONAL_HEADER) + getSize(DATA_DIRECTORIES) + getSize(SECTION) * 4;
+            long headerSize = getSize(DOS_HEADER) + DOS_STUB.length + getSize(COFF_HEADER) + getSize(OPTIONAL_HEADER) + getSize(DATA_DIRECTORIES) + getSize(SECTION) * numberOfSections;
             for (int i = 0; i < 0x400 - headerSize; i++) {
                 writeByte(0, outputStream);
             }
@@ -586,16 +570,6 @@ public class Assembly {
             for (int i = 0; i < 0x200 - MESSAGE.length(); ++i) {
                 writeByte(0, outputStream);
             }
-
-            writeSized(0x1000, 4, outputStream);
-            writeSized(relocLength, 4, outputStream);
-            writeSized(0xA000 | 0x20, 2, outputStream); //IMAGE_REL_BASED_DIR64 | offset
-            writeSized(0, 2, outputStream);
-
-            for (int i = 0; i < 0x200 - relocLength; ++i) {
-                writeByte(0, outputStream);
-            }
-
         }
     }
 
@@ -621,7 +595,14 @@ public class Assembly {
         // Load length of string to third argument
         code.addAll(List.of(0x41L, 0xB8L, (long) MESSAGE.length(), 0x00L, 0x00L, 0x00L)); //mov r8d,0Eh
         // Load address of message to second argument
-        code.addAll(List.of(0x48L, 0xBAL, 0x00L, 0x30L, 0x00L, 0x40L, 0x01L, 0x00L, 0x00L, 0x00L)); //mov rdx,140003000h
+        long offset = 0x3000 - 0x1000 - code.size() - 7;
+        code.addAll(List.of(0x48L, 0x8DL, 0x15L)); //lea rdx,offset
+        System.out.println(offset);
+        for (int j = 0; j < 4; ++j) {
+            code.add(offset & 0xFF);
+            offset >>= 8;
+        }
+
         // Move stdHandle to first argument
         code.addAll(List.of(0x48L, 0x89L, 0xC1L)); //mov rcx,rax
         // Call WriteConsoleA
@@ -649,11 +630,14 @@ public class Assembly {
         for (int i = 0; i < IMPORTED_FUNCTIONS.size(); i++) {
             String function = IMPORTED_FUNCTIONS.get(i);
             int currentOffset = code.size();
-            long offset = 0x2000 + i * 8L - 0x1000 - currentOffset - 6;
+            offset = 0x2000 + i * 8L - 0x1000 - currentOffset - 6;
             code.addAll(List.of(0xFFL, 0x25L)); //jmp qword ptr
             for (int j = 0; j < 4; ++j) {
                 code.add(offset & 0xFF);
                 offset >>= 8;
+            }
+            if (!callIndices.containsKey(function)) {
+                continue;
             }
             long callIndex = callIndices.get(function);
             offset = currentOffset - callIndex - 4;
