@@ -574,28 +574,30 @@ public class Assembly {
     }
 
     private static List<Long> generateCode() {
-        Map<String, Long> callIndices = new HashMap<>();
+        long offset;
         List<Long> code = new ArrayList<>();
         // Prologue
-        // Save base pointer
-        code.add(0x55L); //push rbp
-        // Establish stack frame
-        code.addAll(List.of(0x48L, 0x89L, 0xE5L)); //mov rbp,rsp
+        // Reserve stack space
+        code.addAll(List.of(0x48L, 0x83L, 0xECL, 0x28L)); //sub    rsp,0x28
 
         // Move -11 to first argument
-        code.addAll(List.of(0x48L, 0xC7L, 0xC1L, 0xF5L, 0xFFL, 0xFFL, 0xFFL));//mov rcx,0FFFFFFFFFFFFFFF5h
+        code.addAll(List.of(0xB9L, 0xF5L, 0xFFL, 0xFFL, 0xFFL));//mov ecx,0FFFFFFFFFFFFFFF5h
         // Call GetStdHandle
-        code.addAll(List.of(0xE8L, 0x00L, 0x00L, 0x00L, 0x00L)); //call GetStdHandle
-        callIndices.put("GetStdHandle", code.size() - 4L);
+        offset = 0x2000 + IMPORTED_FUNCTIONS.indexOf("GetStdHandle") * 8L - 0x1000 - code.size() - 6;
+        code.addAll(List.of(0xFFL, 0x15L)); //call offset
+        for (int j = 0; j < 4; ++j) {
+            code.add(offset & 0xFF);
+            offset >>= 8;
+        }
 
         //Push 0 on Stack (as fifth argument, lpReserved)
-        code.addAll(List.of(0x6AL, 0x00L)); //push 0
-        // Move 0 to fourth argument, charsWritten
-        code.addAll(List.of(0x41L, 0xB9L, 0x00L, 0x00L, 0x00L, 0x00L)); //mov r9d,0
+        code.addAll(List.of(0x48L, 0xC7L, 0x44L, 0x24L, 0x20L, 0x00L, 0x00L, 0x00L, 0x00L)); //mov QWORD PTR [rsp+0x20],0x0
+        // Zero out fourth argument, charsWritten
+        code.addAll(List.of(0x45L, 0x31L, 0xC9L)); //xor r9d,r9d
         // Load length of string to third argument
         code.addAll(List.of(0x41L, 0xB8L, (long) MESSAGE.length(), 0x00L, 0x00L, 0x00L)); //mov r8d,0Eh
         // Load address of message to second argument
-        long offset = 0x3000 - 0x1000 - code.size() - 7;
+        offset = 0x3000 - 0x1000 - code.size() - 7;
         code.addAll(List.of(0x48L, 0x8DL, 0x15L)); //lea rdx,offset
         System.out.println(offset);
         for (int j = 0; j < 4; ++j) {
@@ -606,45 +608,22 @@ public class Assembly {
         // Move stdHandle to first argument
         code.addAll(List.of(0x48L, 0x89L, 0xC1L)); //mov rcx,rax
         // Call WriteConsoleA
-        code.addAll(List.of(0xE8L, 0x00L, 0x00L, 0x00L, 0x00L)); //call WriteConsoleA
-        callIndices.put("WriteConsoleA", code.size() - 4L);
-
-        // Epilogue
-        // Set return value to 0
-        code.addAll(List.of(0x48L, 0x31L, 0xC0L)); //xor rax,rax
-        // Destroy stack frame
-        code.addAll(List.of(0x48L, 0x89L, 0xECL)); //mov rsp,rbp
-        // Restore base pointer
-        code.add(0x5DL); //pop rbp
+        offset = 0x2000 + IMPORTED_FUNCTIONS.indexOf("WriteConsoleA") * 8L - 0x1000 - code.size() - 6;
+        code.addAll(List.of(0xFFL, 0x15L)); //call offset
+        for (int j = 0; j < 4; ++j) {
+            code.add(offset & 0xFF);
+            offset >>= 8;
+        }
 
         // Exit
-        // Move 0 in first argument
-        code.addAll(List.of(0xB9L, 0x00L, 0x00L, 0x00L, 0x00L)); //mov ecx,0
+        // Zero out first argument
+        code.addAll(List.of(0x31L, 0xC9L)); //xor ecx,ecx
         // Call ExitProcess
-        code.addAll(List.of(0xE8L, 0x00L, 0x00L, 0x00L, 0x00L)); //call ExitProcess
-        callIndices.put("ExitProcess", code.size() - 4L);
-        // Return
-        code.add(0xC3L); //ret
-
-        // IAT jumps
-        for (int i = 0; i < IMPORTED_FUNCTIONS.size(); i++) {
-            String function = IMPORTED_FUNCTIONS.get(i);
-            int currentOffset = code.size();
-            offset = 0x2000 + i * 8L - 0x1000 - currentOffset - 6;
-            code.addAll(List.of(0xFFL, 0x25L)); //jmp qword ptr
-            for (int j = 0; j < 4; ++j) {
-                code.add(offset & 0xFF);
-                offset >>= 8;
-            }
-            if (!callIndices.containsKey(function)) {
-                continue;
-            }
-            long callIndex = callIndices.get(function);
-            offset = currentOffset - callIndex - 4;
-            for (int j = 0; j < 4; ++j) {
-                code.set((int) (callIndex + j), offset & 0xFF);
-                offset >>= 8;
-            }
+        offset = 0x2000 + IMPORTED_FUNCTIONS.indexOf("ExitProcess") * 8L - 0x1000 - code.size() - 6;
+        code.addAll(List.of(0xFFL, 0x15L)); //call offset
+        for (int j = 0; j < 4; ++j) {
+            code.add(offset & 0xFF);
+            offset >>= 8;
         }
 
         return code;
