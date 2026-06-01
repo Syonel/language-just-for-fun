@@ -48,6 +48,6 @@ public class IfNode extends AstNode {
         if (falseBody.isPresent()) {
             falseBodyString = " else {\n" + falseBody.get().statements.stream().map(s -> "\t" + s.toString()).collect(Collectors.joining("\n")) + "\n}";
         }
-        return "if(" + condition + ") = {\n" + trueBodyString + "\n}";
+        return "if(" + condition + ") = {\n" + trueBodyString + "\n}" + falseBodyString;
     }
 }
