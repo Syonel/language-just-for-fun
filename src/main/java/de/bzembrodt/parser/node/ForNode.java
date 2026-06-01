@@ -63,15 +63,9 @@ public class ForNode extends AstNode {
         String bodyString = body.statements.stream().map(s -> "\t" + s.toString()).collect(Collectors.joining("\n"));
 
         List<String> header = new ArrayList<>();
-        if (init.isPresent()) {
-            header.add("init: " + init);
-        }
-        if (condition.isPresent()) {
-            header.add("condition: " + condition);
-        }
-        if (step.isPresent()) {
-            header.add("step: " + step);
-        }
+        init.ifPresent(node -> header.add("init: " + node));
+        condition.ifPresent(node -> header.add("condition: " + node));
+        step.ifPresent(node -> header.add("step: " + node));
 
         return "for(" + String.join(", ", header) + ") = {\n" + bodyString + "\n}";
     }
