@@ -19,6 +19,8 @@ public enum TokenType {
     CLOSE_ROUND_BRACKET(')'),
     OPEN_CURLY_BRACKET('{'),
     CLOSE_CURLY_BRACKET('}'),
+    OPEN_SQUARE_BRACKET('['),
+    CLOSE_SQUARE_BRACKET(']'),
     AMPERSAND('&'),
     PIPE('|'),
     EXCLAMATION_MARK('!'),

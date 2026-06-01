@@ -79,14 +79,25 @@ public class Interpreter {
     }
 
     public RuntimeType getRuntimeType(String type) {
+        int arraySize = -1;
+        if (type.contains("[")) {
+            String[] split = type.split("\\[");
+            type = split[0];
+            arraySize = Integer.parseInt(split[1].substring(0, split[1].length() - 1));
+        }
+        RuntimeType runtimeType = null;
         for (BuildinType value : BuildinType.values()) {
             if (value.name.equals(type)) {
-                return RuntimeBuildinType.forType(value);
+                runtimeType = RuntimeBuildinType.forType(value);
             }
         }
         //Only buildin types for now
-        assert false;
-        return null;
+        assert runtimeType != null;
+
+        if (arraySize != -1) {
+            runtimeType = new RuntimeArrayType(runtimeType, arraySize);
+        }
+        return runtimeType;
     }
 
     public void declareVariable(String name, RuntimeType type, boolean isConst, Optional<RuntimeValue> value) {
@@ -106,6 +117,21 @@ public class Interpreter {
 
         variable.value = value;
         variable.isInitialized = true;
+    }
+
+    public void assignArrayIndexVariable(String name, long index, RuntimeValue value) {
+        assert currentScope.hasVariable(name, true);
+
+        RuntimeVariable variable = currentScope.getVariable(name);
+        assert !variable.isConst;
+        assert variable.isInitialized;
+        assert variable.type instanceof RuntimeArrayType;
+        RuntimeArrayType arrayType = (RuntimeArrayType) variable.type;
+        assert arrayType.elementsType.equals(value.type);
+
+        List<RuntimeValue> arrayValue = (List<RuntimeValue>) variable.value.value;
+        assert arrayValue.size() > index;
+        arrayValue.set((int) index, value);
     }
 
     public RuntimeValue lookupVariable(String name) {

@@ -204,10 +204,31 @@ public class Parser {
         String type = tokenList.getToken().value;
         tokenList.advance();
 
+        boolean isArray = false;
+        long arraySize = -1;
+        if (tokenList.getToken().type == TokenType.OPEN_SQUARE_BRACKET) {
+            tokenList.advance();
+            isArray = true;
+            if (tokenList.getToken().type == TokenType.NUMBER) {
+                arraySize = Long.parseLong(tokenList.getToken().value);
+                tokenList.advance();
+            }
+            assert tokenList.getToken().type == TokenType.CLOSE_SQUARE_BRACKET;
+            tokenList.advance();
+        }
+
         Optional<AstNode> initializer = Optional.empty();
         if (tokenList.getToken().type == TokenType.EQUALS) {
             tokenList.advance();
             initializer = Optional.of(parseArithmeticExpression(tokenList));
+        }
+
+        if (isArray && arraySize == -1) {
+            assert initializer.isPresent() && initializer.get() instanceof ArrayNode;
+            arraySize = ((ArrayNode) initializer.get()).values.size();
+        }
+        if (isArray) {
+            type += "[" + arraySize + "]";
         }
         // Constants have to be initialized directly
         assert !isConst || initializer.isPresent();
@@ -296,9 +317,14 @@ public class Parser {
         AstNode lhs = operands.pop();
         OperatorAndToken opAndToken = operators.pop();
         if (opAndToken.op == BinaryOperation.Operator.ASSIGN) {
-            assert lhs instanceof NameLookupNode;
-            NameLookupNode lhsName = (NameLookupNode) lhs;
-            operands.push(new VariableAssignmentNode(lhsName.name, rhs, opAndToken.token));
+            assert lhs instanceof NameLookupNode || lhs instanceof ArrayAccessNode;
+
+            if (lhs instanceof NameLookupNode lhsName) {
+                operands.push(new VariableAssignmentNode(lhsName.name, rhs, opAndToken.token));
+            } else if (lhs instanceof ArrayAccessNode lhsArray) {
+                assert lhsArray.array instanceof NameLookupNode;
+                operands.push(new ArrayIndexAssignmentNode(((NameLookupNode) lhsArray.array).name, lhsArray.index, rhs, opAndToken.token));
+            }
         } else {
             operands.push(new BinaryOperation(lhs, opAndToken.op, rhs, opAndToken.token));
         }
@@ -335,7 +361,28 @@ public class Parser {
                 tokenList.advance();
                 expression = new UnaryOperation(UnaryOperation.Operator.NEGATE, parsePrimaryExpression(tokenList), token);
             }
+            case OPEN_SQUARE_BRACKET -> {
+                tokenList.advance();
+                List<AstNode> nodes = new ArrayList<>();
+                while (tokenList.getToken().type != TokenType.CLOSE_SQUARE_BRACKET) {
+                    nodes.add(parseArithmeticExpression(tokenList));
+                    assert tokenList.getToken().type == TokenType.CLOSE_SQUARE_BRACKET || tokenList.getToken().type == TokenType.COMMA;
+                    if (tokenList.getToken().type == TokenType.COMMA) {
+                        tokenList.advance();
+                    }
+                }
+                tokenList.advance();
+                expression = new ArrayNode(nodes, token);
+            }
         }
+        if (tokenList.getToken().type == TokenType.OPEN_SQUARE_BRACKET) {
+            token = tokenList.getToken();
+            tokenList.advance();
+            expression = new ArrayAccessNode(expression, parseArithmeticExpression(tokenList), token);
+            assert tokenList.getToken().type == TokenType.CLOSE_SQUARE_BRACKET;
+            tokenList.advance();
+        }
+
         assert expression != null;
         return expression;
     }
