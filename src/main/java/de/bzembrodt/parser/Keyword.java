@@ -13,6 +13,9 @@ public enum Keyword {
     FALSE("false"),
     IF("if"),
     ELSE("else"),
+    FOR("for"),
+    BREAK("break"),
+    CONTINUE("continue"),
     ;
 
     public final String name;

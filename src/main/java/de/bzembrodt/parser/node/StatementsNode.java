@@ -22,6 +22,9 @@ public class StatementsNode extends AstNode {
             if (interpreter.shouldReturn()) {
                 return interpreter.doReturn();
             }
+            if (interpreter.shouldBreak() || interpreter.shouldContinue()) {
+                return null;
+            }
         }
         return null;
     }

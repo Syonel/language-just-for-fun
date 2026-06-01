@@ -34,6 +34,6 @@ public class Scope {
             return variables.get(name);
         }
         assert parentScope.isPresent();
-        return parentScope.get().variables.get(name);
+        return parentScope.get().getVariable(name);
     }
 }

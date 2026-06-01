@@ -21,7 +21,7 @@ public class Parser {
     private AstNode parseProgram(TokenList tokenList) {
         List<AstNode> statements = new ArrayList<>();
         while (tokenList.getToken().type != TokenType.EOF) {
-            AstNode statement = parseStatement(tokenList);
+            AstNode statement = parseStatement(tokenList, true);
             if (statement != null) {
                 statements.add(statement);
             }
@@ -30,13 +30,12 @@ public class Parser {
         return new StatementsNode(statements);
     }
 
-    private AstNode parseStatement(TokenList tokenList) {
+    private AstNode parseStatement(TokenList tokenList, boolean needsSemicolon) {
         //Empty Statements are fine
         if (tokenList.getToken().type == TokenType.SEMICOLON) {
             tokenList.advance();
             return null;
         }
-        boolean needsSemicolon = true;
         AstNode statement;
         if (tokenList.getToken().type == TokenType.IDENTIFIER && (tokenList.getToken().value.equals(Keyword.CONST.name) || tokenList.getToken().value.equals(Keyword.VAR.name))) {
             statement = parseVariableDeclaration(tokenList);
@@ -53,18 +52,19 @@ public class Parser {
                 statement = new ReturnNode(Optional.of(parseArithmeticExpression(tokenList)), token);
             }
         } else if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keyword.IF.name)) {
-            Token token = tokenList.getToken();
-            tokenList.advance();
-            AstNode condition = parseArithmeticExpression(tokenList);
-            List<AstNode> trueBlock = parseBlock(tokenList);
-            Optional<List<AstNode>> falseBlock = Optional.empty();
-            if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keyword.ELSE.name)) {
-                tokenList.advance();
-                falseBlock = Optional.of(parseBlock(tokenList));
-            }
-            statement = new IfNode(condition, new StatementsNode(trueBlock), falseBlock.map(StatementsNode::new), token);
+            statement = parseIf(tokenList);
             needsSemicolon = false;
 
+        } else if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keyword.FOR.name)) {
+            statement = parseFor(tokenList);
+            needsSemicolon = false;
+
+        } else if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keyword.BREAK.name)) {
+            statement = new BreakNode(tokenList.getToken());
+            tokenList.advance();
+        } else if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keyword.CONTINUE.name)) {
+            statement = new ContinueNode(tokenList.getToken());
+            tokenList.advance();
         } else {
             statement = parseArithmeticExpression(tokenList);
         }
@@ -73,6 +73,53 @@ public class Parser {
             tokenList.advance();
         }
         return statement;
+    }
+
+    private AstNode parseIf(TokenList tokenList) {
+        Token token = tokenList.getToken();
+        tokenList.advance();
+        AstNode condition = parseArithmeticExpression(tokenList);
+        List<AstNode> trueBlock = parseBlock(tokenList);
+        Optional<List<AstNode>> falseBlock = Optional.empty();
+        if (tokenList.getToken().type == TokenType.IDENTIFIER && tokenList.getToken().value.equals(Keyword.ELSE.name)) {
+            tokenList.advance();
+            falseBlock = Optional.of(parseBlock(tokenList));
+        }
+        return new IfNode(condition, new StatementsNode(trueBlock), falseBlock.map(StatementsNode::new), token);
+    }
+
+    private AstNode parseFor(TokenList tokenList) {
+        Token token = tokenList.getToken();
+        tokenList.advance();
+        List<AstNode> header = new ArrayList<>();
+        int nodesFound = 0;
+        for (; nodesFound < 3; nodesFound++) {
+            if (tokenList.getToken().type == TokenType.OPEN_CURLY_BRACKET) {
+                break;
+            }
+            header.add(parseStatement(tokenList, false));
+            assert tokenList.getToken().type == TokenType.OPEN_CURLY_BRACKET || tokenList.getToken().type == TokenType.SEMICOLON;
+            if (tokenList.getToken().type == TokenType.SEMICOLON) {
+                tokenList.advance();
+            }
+        }
+        Optional<AstNode> init = Optional.empty();
+        Optional<AstNode> condition = Optional.empty();
+        Optional<AstNode> step = Optional.empty();
+
+        if (nodesFound == 1) {
+            condition = Optional.of(header.get(0));
+        } else if (nodesFound == 2) {
+            init = Optional.of(header.get(0));
+            condition = Optional.of(header.get(1));
+        } else if (nodesFound == 3) {
+            init = Optional.of(header.get(0));
+            condition = Optional.of(header.get(1));
+            step = Optional.of(header.get(2));
+        }
+
+        List<AstNode> body = parseBlock(tokenList);
+        return new ForNode(init, condition, step, new StatementsNode(body), token);
     }
 
     private AstNode parseFunctionDefinition(TokenList tokenList) {
@@ -130,7 +177,7 @@ public class Parser {
 
         List<AstNode> statements = new ArrayList<>();
         while (tokenList.getToken().type != TokenType.EOF && tokenList.getToken().type != TokenType.CLOSE_CURLY_BRACKET) {
-            AstNode statement = parseStatement(tokenList);
+            AstNode statement = parseStatement(tokenList, true);
             if (statement != null) {
                 statements.add(statement);
             }

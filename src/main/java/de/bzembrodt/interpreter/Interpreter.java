@@ -15,6 +15,8 @@ public class Interpreter {
     private final Scope globalScope = new Scope(Optional.empty(), Optional.empty());
     private Scope currentScope = globalScope;
     private boolean shouldReturn = false;
+    private boolean shouldBreak = false;
+    private boolean shouldContinue = false;
     private RuntimeValue returnValue;
 
     public Interpreter() {
@@ -124,6 +126,14 @@ public class Interpreter {
         return shouldReturn;
     }
 
+    public boolean shouldBreak() {
+        return shouldBreak;
+    }
+
+    public boolean shouldContinue() {
+        return shouldContinue;
+    }
+
     public RuntimeValue doReturn() {
         RuntimeValue result = returnValue;
         shouldReturn = false;
@@ -132,5 +142,21 @@ public class Interpreter {
         currentScope = currentScope.callerScope.get();
 
         return result;
+    }
+
+    public void doBreak() {
+        shouldBreak = true;
+    }
+
+    public void doContinue() {
+        shouldContinue = true;
+    }
+
+    public void clearBreak() {
+        shouldBreak = false;
+    }
+
+    public void clearContinue() {
+        shouldContinue = false;
     }
 }
