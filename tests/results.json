@@ -100,4 +100,10 @@
   "expectedAst" : "{\n\tdecl_v['arr'] = [#4, #3, #2, #1]\n\tset['arr'][#2] = #5\n\tfor(init: decl_v['i'] = #0, condition: (@i < #4), step: set['i'] = (@i + #1)) = {\n\tcall['print'](@arr[@i])\n}\n\tcall['print']([#1, #2, #3, #4][#1])\n}",
   "expectedOutput" : "4\n3\n5\n1\n2\n",
   "expectedReturn" : "null"
+}, {
+  "fileName" : "018_simple_strings.ljff",
+  "expectedTokens" : "[IDENTIFIER(var)[1:1], IDENTIFIER(s)[1:5], COLON[1:6], IDENTIFIER(string)[1:8], EQUALS[1:15], STRING[1:17], SEMICOLON[1:39], IDENTIFIER(print)[3:1], OPEN_ROUND_BRACKET[3:6], IDENTIFIER(s)[3:7], CLOSE_ROUND_BRACKET[3:8], SEMICOLON[3:9], EOF[3:10]]",
+  "expectedAst" : "{\n\tdecl_v['s'] = #'Hello World!\n\t\\\"'\n\tcall['print'](@s)\n}",
+  "expectedOutput" : "Hello World!\n\t\\\"\n",
+  "expectedReturn" : "null"
 } ]

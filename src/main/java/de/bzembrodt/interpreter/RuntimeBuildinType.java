@@ -20,6 +20,7 @@ public class RuntimeBuildinType extends RuntimeType {
 
     public static final RuntimeBuildinType INT = forType(BuildinType.INT);
     public static final RuntimeBuildinType BOOL = forType(BuildinType.BOOL);
+    public static final RuntimeBuildinType STRING = forType(BuildinType.STRING);
 
     public final BuildinType type;
 

@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 public enum TokenType {
     IDENTIFIER(TokenType::isAlphabetic, (c, _) -> isAlphanumeric(c)),
     NUMBER(TokenType::isNumeric, (c, _) -> isNumeric(c)),
+    STRING(TokenType::isStringStart, TokenType::isStringContinuation),
 
     SEMICOLON(';'),
     PLUS('+'),
@@ -51,6 +52,25 @@ public enum TokenType {
 
     private static boolean isAlphanumeric(char c) {
         return isAlphabetic(c) || isNumeric(c);
+    }
+
+    private static boolean isStringStart(char c) {
+        return c == '\"';
+    }
+
+    private static boolean isStringContinuation(char c, String s) {
+        if (s.length() < 2 || s.charAt(s.length() - 1) != '\"') {
+            return true;
+        }
+        int backslashCount = 0;
+        for (int i = s.length() - 2; i >= 0; i--) {
+            if (s.charAt(i) == '\\') {
+                backslashCount++;
+            } else {
+                break;
+            }
+        }
+        return backslashCount % 2 == 1;
     }
 
     static TokenType getTokenType(char c) {

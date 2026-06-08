@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 public enum BuildinType {
     INT("int"),
     BOOL("bool"),
+    STRING("string"),
     ;
 
     public final String name;

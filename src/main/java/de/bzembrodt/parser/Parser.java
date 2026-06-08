@@ -353,6 +353,10 @@ public class Parser {
                 expression = new NumberNode(Long.parseLong(token.value), token);
                 tokenList.advance();
             }
+            case STRING -> {
+                expression = new StringNode(parseString(token.value), token);
+                tokenList.advance();
+            }
             case EXCLAMATION_MARK -> {
                 tokenList.advance();
                 expression = new UnaryOperation(UnaryOperation.Operator.NOT, parsePrimaryExpression(tokenList), token);
@@ -408,5 +412,37 @@ public class Parser {
         tokenList.advance();
 
         return new FunctionCallNode(name, params, token);
+    }
+
+    private String parseString(String in) {
+        StringBuilder sb = new StringBuilder();
+        boolean escaped = false;
+        for (char c : in.toCharArray()) {
+            if (escaped) {
+                sb.append(switch (c) {
+                    case 't' -> '\t';
+                    case 'b' -> '\b';
+                    case 'n' -> '\n';
+                    case 'r' -> '\r';
+                    case 'f' -> '\f';
+                    case '\"' -> '\"';
+                    case '\\' -> '\\';
+                    default -> {
+                        assert false;
+                        yield '\0';
+                    }
+                });
+                escaped = false;
+                continue;
+            }
+            if (c == '\\') {
+                escaped = true;
+                continue;
+            }
+            sb.append(c);
+        }
+        String result = sb.toString();
+        assert result.length() >= 2 && result.charAt(0) == '"' && result.charAt(result.length() - 1) == '"';
+        return result.substring(1, result.length() - 1);
     }
 }
